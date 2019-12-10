@@ -29,3 +29,10 @@ at what time to have a clear view onto the ISS with my telescope?
 - (optional) Forecast
 - (optional) ISS Pass Times: A list of upcoming ISS passes for a particular location
 - (optional) How many people are in space right now?
+
+## Grading
+
+-4: Aktuelle Position auf der Map anzeigen	
+-3: Ausbau um zusätzliche Wetter API / ISS Passtime abgleich	
+-2: Letzte Location speichern und anzeigen
+-1: Wetter Layer / Datenbank Mehrere Locations
