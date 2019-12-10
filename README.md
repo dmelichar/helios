@@ -11,14 +11,15 @@
 The International Space Station (ISS) circles the earth in roughly 92 minutes and
 completes 15.5 orbits per day. The ISS orbits are fixed, and only a few 
 geographical locations are flown over. A precise live map of the station's current
-position, and the weather conditions around that point on earth, are required.
+position above earth, and the weather conditions around that point, are required
+if one wants to take a look at it.
 
-The Helios web-service aims to solve this problem. By collection data from 
-various sources and APIs, such as from NASA and ZAMG, processing the information,
-and then displaying a live map representation.
+The Helios web-service aims to solve this problem. It does so by collection data 
+from various sources and APIs, such as from NASA and ZAMG, processing the
+information, and then displaying a live map representation.
 
-Our main goal is to answer the simple question of: where do I need to stand to 
-have a clear view onto the ISS with my telescope?
+Our main goal is to answer the simple question of: where do I need to stand and
+at what time to have a clear view onto the ISS with my telescope?
 
 ## Functionalities
 
