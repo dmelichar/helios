@@ -26,3 +26,5 @@ have a clear view onto the ISS with my telescope?
 - NASA API for ISS location integrated into Map
 - ZAMG API for weather integrated into Map
 - (optional) Forecast
+- (optional) ISS Pass Times: A list of upcoming ISS passes for a particular location
+- (optional) How many people are in space right now?
