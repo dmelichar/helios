@@ -4,9 +4,9 @@ import '@vaadin/vaadin-button/vaadin-button.js';
 import '@vaadin/vaadin-text-field/vaadin-text-field.js';
 import '@polymer/iron-icon/iron-icon.js';
 
-class LandingElement extends PolymerElement {
-  static get template() {
-    return html`
+class ReviewListElement extends PolymerElement {
+    static get template() {
+        return html`
         <style include="lumo-color lumo-typography lumo-badge view-styles">
             :host {
                 display: block;
@@ -203,6 +203,7 @@ class LandingElement extends PolymerElement {
                 <span>[[reviewButtonText]]</span>
             </vaadin-button>
         </div>
+
         <div class="view-container reviews">
             <h2 id="header"></h2>
             <template is="dom-if" if="{{!_isEmpty(reviews)}}">
@@ -240,15 +241,14 @@ class LandingElement extends PolymerElement {
             </template>
         </div>
 `;
-  }
+    }
 
-  static get is() {
-      return 'landing'
-  }
+    static get is() {
+        return 'reviews-list'
+    }
 
-  _isEmpty(array) {
-      return array.length == 0;
-  }
+    _isEmpty(array) {
+        return array.length == 0;
+    }
 }
-customElements.define(LandingElement.is, LandingElement);
-
+customElements.define(ReviewListElement.is, ReviewListElement);

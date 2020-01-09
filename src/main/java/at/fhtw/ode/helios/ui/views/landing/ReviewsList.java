@@ -6,6 +6,7 @@ import at.fhtw.ode.helios.ui.MainLayout;
 import at.fhtw.ode.helios.ui.common.AbstractEditorDialog;
 import at.fhtw.ode.helios.ui.encoders.LocalDateToStringEncoder;
 import at.fhtw.ode.helios.ui.encoders.LongToStringEncoder;
+import at.fhtw.ode.helios.ui.views.landing.ReviewsList.ReviewsModel;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.Tag;
@@ -31,12 +32,10 @@ import java.util.List;
 
 
 @Route(value = "", layout = MainLayout.class)
-@PageTitle("Landing")
-@Tag("Landing")
-@JsModule("./src/views/reviewslist/landing.js")
-public class Landing extends PolymerTemplate<Landing.ReviewsModel> {
-
-    private static final String API_KEY = "AIzaSyAzY39vFySJv2Bu-b6KgDqC6ZLkM5f1-Us";
+@PageTitle("Review List")
+@Tag("reviews-list")
+@JsModule("./src/views/reviewslist/reviews-list.js")
+public class ReviewsList extends PolymerTemplate<ReviewsModel> {
 
     public interface ReviewsModel extends TemplateModel {
         @Encode(value = LongToStringEncoder.class, path = "id")
@@ -51,24 +50,31 @@ public class Landing extends PolymerTemplate<Landing.ReviewsModel> {
     private Button addReview;
     @Id("header")
     private H2 header;
-    //@Id("google-map")
-    //private GoogleMap map;
 
     private ReviewEditorDialog reviewForm = new ReviewEditorDialog(
             this::saveUpdate, this::deleteUpdate);
 
-    public Landing() {
-        search.setPlaceholder("Search previous locations");
+    public ReviewsList() {
+        search.setPlaceholder("Search reviews");
         search.addValueChangeListener(e -> updateList());
         search.setValueChangeMode(ValueChangeMode.EAGER);
         search.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
 
-        //map.setLatitude(62);
-        //map.setLongitude(24);
-
         addReview.addClickListener(e -> openForm(new Review(),
                 AbstractEditorDialog.Operation.ADD));
+        /*
+            This is a fall-back method:
+            '+' is not a event.code (DOM events), so as a fall-back shortcuts
+            will perform a character-based comparison. Since Key.ADD changes
+            locations frequently based on the keyboard layout's language, we
+            opted to use a character instead.
+         */
         addReview.addClickShortcut(Key.of("+"));
+
+
+        // Set review button and edit button text from Java
+        getElement().setProperty("reviewButtonText", "New review");
+        getElement().setProperty("editButtonText", "Edit");
 
         updateList();
 
@@ -121,5 +127,4 @@ public class Landing extends PolymerTemplate<Landing.ReviewsModel> {
         }
         reviewForm.open(review, operation);
     }
-
 }

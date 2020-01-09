@@ -36,3 +36,16 @@ at what time to have a clear view onto the ISS with my telescope?
 - 3: Ausbau um zusätzliche Wetter API / ISS Passtime abgleich	
 - 2: Letzte Location speichern und anzeigen
 - 1: Wetter Layer / Datenbank Mehrere Locations
+
+
+## Requirements
+
+- NodeJS v12.14.1 LTS
+- Maven with Java 8+
+
+
+## Running / Installing
+
+``` bash
+mvn clean install spring-boot:run
+```

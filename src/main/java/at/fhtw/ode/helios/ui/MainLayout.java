@@ -1,7 +1,7 @@
 package at.fhtw.ode.helios.ui;
 
 import at.fhtw.ode.helios.ui.views.categorieslist.CategoriesList;
-import at.fhtw.ode.helios.ui.views.landing.Landing;
+import at.fhtw.ode.helios.ui.views.landing.ReviewsList;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
@@ -22,7 +22,7 @@ import com.vaadin.flow.server.PageConfigurator;
  */
 @CssImport(value = "./styles/view-styles.css", id = "view-styles")
 @CssImport(value = "./styles/shared-styles.css", include = "view-styles")
-@PWA(name = "Beverage Buddy", shortName = "BevBuddy")
+@PWA(name = "Helios", shortName = "Helios")
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
 public class MainLayout extends Div
         implements RouterLayout, PageConfigurator {
@@ -31,7 +31,7 @@ public class MainLayout extends Div
         H2 title = new H2("Helios");
         title.addClassName("main-layout__title");
 
-        RouterLink reviews = new RouterLink(null, Landing.class);
+        RouterLink reviews = new RouterLink(null, ReviewsList.class);
         reviews.add(new Icon(VaadinIcon.MAP_MARKER), new Text("Map"));
         reviews.addClassName("main-layout__nav-item");
         // Only show as active for the exact URL, but not for sub paths
