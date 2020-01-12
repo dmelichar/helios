@@ -1,7 +1,7 @@
 package at.fhtw.ode.helios.ui;
 
 import at.fhtw.ode.helios.ui.views.categorieslist.CategoriesList;
-import at.fhtw.ode.helios.ui.views.landing.ReviewsList;
+import at.fhtw.ode.helios.ui.views.landing.LandingPage;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
@@ -16,10 +16,7 @@ import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.server.PageConfigurator;
 
-/**
- * The main layout contains the header with the navigation buttons, and the
- * child views below that.
- */
+
 @CssImport(value = "./styles/view-styles.css", id = "view-styles")
 @CssImport(value = "./styles/shared-styles.css", include = "view-styles")
 @PWA(name = "Helios", shortName = "Helios")
@@ -31,17 +28,17 @@ public class MainLayout extends Div
         H2 title = new H2("Helios");
         title.addClassName("main-layout__title");
 
-        RouterLink reviews = new RouterLink(null, ReviewsList.class);
-        reviews.add(new Icon(VaadinIcon.MAP_MARKER), new Text("Map"));
-        reviews.addClassName("main-layout__nav-item");
+        RouterLink landing = new RouterLink(null, LandingPage.class);
+        landing.add(new Icon(VaadinIcon.MAP_MARKER), new Text("Map"));
+        landing.addClassName("main-layout__nav-item");
         // Only show as active for the exact URL, but not for sub paths
-        reviews.setHighlightCondition(HighlightConditions.sameLocation());
+        landing.setHighlightCondition(HighlightConditions.sameLocation());
 
         RouterLink categories = new RouterLink(null, CategoriesList.class);
         categories.add(new Icon(VaadinIcon.CLOUD), new Text("Weather"));
         categories.addClassName("main-layout__nav-item");
 
-        Div navigation = new Div(reviews, categories);
+        Div navigation = new Div(landing, categories);
         navigation.addClassName("main-layout__nav");
 
         Div header = new Div(title, navigation);
