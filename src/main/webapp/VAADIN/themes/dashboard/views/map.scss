@@ -1,0 +1,21 @@
+@mixin dashboard-map-view {
+
+    .map {
+
+      .viewheader {
+        padding: $view-padding;
+        height: 20%;
+      }
+
+      .v-slot:focus {
+        outline: none;
+      }
+
+      .v-slot-leafletmap {
+          height: 100%;
+      }
+
+
+
+  }
+}

@@ -1,0 +1,10 @@
+@mixin dashboard-locations-view {
+
+  .locations {
+    .viewheader {
+      padding: $view-padding;
+      border-bottom: valo-border($strength: 0.5);
+    }
+  }
+
+}
