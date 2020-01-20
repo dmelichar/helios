@@ -1,5 +1,6 @@
 package at.fhtw.ode.helios.domain;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.vaadin.addon.leaflet.shared.Point;
@@ -25,4 +26,8 @@ public final class Location {
         this.location = location;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s @ %s", Arrays.toString(location.getLatLonPair()), date.toString());
+    }
 }

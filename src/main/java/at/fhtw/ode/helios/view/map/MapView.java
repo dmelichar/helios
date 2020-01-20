@@ -2,6 +2,8 @@ package at.fhtw.ode.helios.view.map;
 
 import java.util.Date;
 
+import at.fhtw.ode.helios.HeliosUI;
+import at.fhtw.ode.helios.domain.Location;
 import com.vaadin.navigator.View;
 import com.vaadin.server.Responsive;
 import com.vaadin.ui.Button;
@@ -16,8 +18,6 @@ import org.vaadin.addon.leaflet.LCircleMarker;
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LOpenStreetMapLayer;
-import org.vaadin.addon.leaflet.LeafletLocateEvent;
-import org.vaadin.addon.leaflet.LeafletLocateListener;
 
 
 @SuppressWarnings("serial")
@@ -55,40 +55,32 @@ public class MapView extends VerticalLayout implements View {
         titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         buttonHeader.addComponent(titleLabel);
 
-        Button locate = new Button("Locate");
-        locate.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                map.locate();
-            }
-        });
+        Button locate = new Button("Locate Me");
+        locate.addClickListener((Button.ClickListener) event -> map.locate());
         buttonHeader.addComponent(locate);
 
+        Button locateISS = new Button("Locate ISS");
+        locateISS.addClickListener((Button.ClickListener) event -> locateISSListener());
+        buttonHeader.addComponent(locateISS);
 
-        // Todo: new button for locate ISS
-        // ToDo: new button for "check if visible", no new map overlay too much
-
-        // Button saveLocation = new Button("Save location");
-        // saveLocation.addClickListener(new Button.ClickListener() {
-        //     @Override
-        //     public void buttonClick(Button.ClickEvent event) {
-
-        //     }
-        // });
-        // buttonHeader.addComponent(saveLocation);
-
-        // Button stop = new Button("Stop");
-        // stop.addClickListener(new Button.ClickListener() {
-        //     @Override
-        //     public void buttonClick(Button.ClickEvent event) {
-        //         map.stopLocate();
-        //     }
-        // });
-        // buttonHeader.addComponent(stop);
+        Button saveState = new Button("Save State");
+        saveState.addClickListener((Button.ClickListener) event -> saveStateListener());
+        buttonHeader.addComponent(saveState);
 
         return buttonHeader;
     }
 
+    public void locateISSListener() {
+        final Label iss_pos = new Label();
+        Location location = HeliosUI.getDataProvider().getISSLocation();
+
+        iss_pos.setValue(location.toString());
+        addComponent(iss_pos);
+    }
+
+    public void saveStateListener() {
+
+    }
 
     public void configureMap() {
         final Label pos = new Label();
@@ -98,22 +90,19 @@ public class MapView extends VerticalLayout implements View {
         final LCircleMarker cm = new LCircleMarker();
         final LCircle c = new LCircle();
 
-        map.addLocateListener(new LeafletLocateListener() {
-            @Override
-            public void onLocate(LeafletLocateEvent event) {
-                pos.setValue(new Date().toString() + ": " + event.toString());
-                if (m.getParent() == null) {
-                    m.setPoint(event.getPoint());
-                    cm.setPoint(event.getPoint());
-                    cm.setColor("red");
-                    cm.setRadius(1);
-                    c.setPoint(event.getPoint());
-                    c.setColor("yellow");
-                    c.setStroke(false);
-                    c.setRadius(event.getAccuracy());
-                    map.addComponents(m, cm, c);
-                    map.setLayersToUpdateOnLocate(m, cm, c);
-                }
+        map.addLocateListener(event -> {
+            pos.setValue(new Date().toString() + ": " + event.toString());
+            if (m.getParent() == null) {
+                m.setPoint(event.getPoint());
+                cm.setPoint(event.getPoint());
+                cm.setColor("red");
+                cm.setRadius(1);
+                c.setPoint(event.getPoint());
+                c.setColor("yellow");
+                c.setStroke(false);
+                c.setRadius(event.getAccuracy());
+                map.addComponents(m, cm, c);
+                map.setLayersToUpdateOnLocate(m, cm, c);
             }
         });
 

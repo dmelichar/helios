@@ -21,6 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -31,8 +32,8 @@ import at.fhtw.ode.helios.domain.Location;
 
 public class DataProvider {
 
-    // TODO: get long & lat from ISS
-    private static final String NASA_API_KEY = null;
+    private static final String ISS_API = "http://api.open-notify.org/iss-now.json";
+    private static final String DARKSKY_API = "https://api.darksky.net/forecast/1a8c4d19947f4c72b82a5b76a742aecb/%s,%s";
 
     private static Multimap<Long, Location> locations;
     private static Date lastDataUpdate;
@@ -60,6 +61,7 @@ public class DataProvider {
         }
         return sb.toString();
     }
+
 
     /* JSON utility method */
     private static JsonObject readJsonFromUrl(String url) throws IOException {
@@ -105,14 +107,38 @@ public class DataProvider {
 
     public Collection<Location> getRecentLocations(int count) {
         List<Location> orderedLocations = Lists.newArrayList(locations.values());
-        Collections.sort(orderedLocations, new Comparator<Location>() {
-			@Override
-			public int compare(Location o1, Location o2) {
-				return o2.getDate().compareTo((o1.getDate()));
-			}
-        });
+        Collections.sort(orderedLocations, (o1, o2) -> o2.getDate().compareTo((o1.getDate())));
 
         return orderedLocations.subList(0,
             Math.min(count, locations.values().size() -1));
+    }
+
+    public Location getISSLocation() {
+        Location location = null;
+
+        try {
+            location = new Location();
+            JsonObject response = readJsonFromUrl(ISS_API);
+
+            Instant time = Instant.ofEpochSecond(response.get("timestamp").getAsLong());
+            location.setDate(Date.from(time));
+
+            JsonObject pos = response.get("iss_position").getAsJsonObject();
+            location.setLocation(new Point(pos.get("latitude").getAsDouble(), pos.get("longitude").getAsDouble()));
+
+            return location;
+
+        } catch(IOException e) {
+
+        }
+
+        return location;
+    }
+
+    public String getWeatherData() {
+        String weather = null;
+
+        return weather;
+
     }
 }
