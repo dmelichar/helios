@@ -5,15 +5,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.sql.Time;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,7 +33,6 @@ public class DataProvider extends VerticalLayout implements View {
 
     private static final String ISS_API = "http://api.open-notify.org/iss-now.json";
     private static final String DARKSKY_API = "https://api.darksky.net/forecast/1a8c4d19947f4c72b82a5b76a742aecb/%s,%s";
-    private static final String ISS_PASS_TIMES_API = "http://api.open-notify.org/iss-pass.json?lat=LAT&lon=LON";
     private static final String PEOPLE_IN_SPACE_API = "http://api.open-notify.org/astros.json";
 
     private static Multimap<Long, Location> locations;
@@ -146,12 +140,20 @@ public class DataProvider extends VerticalLayout implements View {
         PeopleInSpace people = null;
 
         try {
-            people = new PeopleInSpace(0);
+            people = new PeopleInSpace();
             JsonObject response = readJsonFromUrl(PEOPLE_IN_SPACE_API);
 
             int number = response.get("number").getAsInt();
             people.setNumberOfPeople(number);
 
+            ArrayList<JsonElement> namesOfPeople = new ArrayList<JsonElement>();
+            JsonArray names = response.get("people").getAsJsonArray();
+
+            for (JsonElement jsonElement : names) {
+                namesOfPeople.add(jsonElement);
+            }
+
+            people.setNamesOfPeople(namesOfPeople);
             return people;
 
         } catch(IOException e) {
@@ -161,8 +163,51 @@ public class DataProvider extends VerticalLayout implements View {
         return people;
     }
 
-       public Location getISSPassTimes(Location myLocation, int passes) {
+       public Location getISSPassTimes(Location myLocation) {
 
+           Location location = null;
+
+           try {
+               String latitude = "";
+               String longitude = "";
+
+               Pattern pattern = Pattern.compile(", *");
+               Matcher matcher = pattern.matcher(myLocation.getLocation().toString());
+               if (matcher.find()) {
+                   latitude = myLocation.getLocation().toString().substring(0, matcher.start());
+                   longitude = myLocation.getLocation().toString().substring(matcher.end());
+               }
+
+               String ISS_PASS_TIMES_API = "http://api.open-notify.org/iss-pass.json?lat=" + latitude + "&lon=" + longitude;
+
+               location = new Location();
+               JsonObject response = readJsonFromUrl(ISS_PASS_TIMES_API);
+
+              // JsonObject times = response.get("response").getAsJsonObject();
+               //Instant time = Instant.ofEpochSecond(times.get("risetime").getAsLong());
+               //location.setDate(Date.from(time));
+
+               ArrayList<JsonElement> risetimes = new ArrayList<JsonElement>();
+               JsonArray times = response.get("response").getAsJsonArray();
+
+               for (JsonElement jsonElement : times) {
+                   risetimes.add(jsonElement);
+               }
+
+               location.setRisetimes(risetimes);
+               return location;
+
+           } catch(IOException e) {
+
+           }
+
+           return location;
+
+
+
+
+
+/*
            HttpURLConnection con;
            OutputStreamWriter out = null;
            InputStreamReader reader = null;
@@ -222,7 +267,7 @@ public class DataProvider extends VerticalLayout implements View {
                 // ignore
             }
         }
-           return passTimeLocation;
+           return passTimeLocation;*/
        }
 
     public String getWeatherData() {
