@@ -146,7 +146,7 @@ public class DataProvider extends VerticalLayout implements View {
             int number = response.get("number").getAsInt();
             people.setNumberOfPeople(number);
 
-            ArrayList<JsonElement> namesOfPeople = new ArrayList<JsonElement>();
+            ArrayList<JsonElement> namesOfPeople = new ArrayList<>();
             JsonArray names = response.get("people").getAsJsonArray();
 
             for (JsonElement jsonElement : names) {
@@ -183,11 +183,7 @@ public class DataProvider extends VerticalLayout implements View {
                location = new Location();
                JsonObject response = readJsonFromUrl(ISS_PASS_TIMES_API);
 
-              // JsonObject times = response.get("response").getAsJsonObject();
-               //Instant time = Instant.ofEpochSecond(times.get("risetime").getAsLong());
-               //location.setDate(Date.from(time));
-
-               ArrayList<JsonElement> risetimes = new ArrayList<JsonElement>();
+               ArrayList<JsonElement> risetimes = new ArrayList<>();
                JsonArray times = response.get("response").getAsJsonArray();
 
                for (JsonElement jsonElement : times) {
@@ -202,78 +198,10 @@ public class DataProvider extends VerticalLayout implements View {
            }
 
            return location;
-
-
-
-
-
-/*
-           HttpURLConnection con;
-           OutputStreamWriter out = null;
-           InputStreamReader reader = null;
-           BufferedReader buffer = null;
-
-           Location passTimeLocation = null;
-
-           try {
-
-            URL url = new URL(ISS_PASS_TIMES_API);
-
-            con = (HttpURLConnection) url.openConnection();
-            con.setDoOutput(true);
-            con.setRequestMethod("POST");
-            con.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
-            con.setRequestProperty( "charset", "utf-8");
-            con.connect();
-
-            String latitude = "";
-            String longitude = "";
-
-            Pattern pattern = Pattern.compile(", *");
-            Matcher matcher = pattern.matcher(myLocation.getLocation().toString());
-            if (matcher.find()) {
-                latitude = myLocation.getLocation().toString().substring(0, matcher.start());
-                longitude = myLocation.getLocation().toString().substring(matcher.end());
-            }
-
-            out = new OutputStreamWriter(con.getOutputStream());
-            out.write("\"request\":{" +
-                    "\"latitude\": \"" + latitude + "\",\"longitude\": \""+ longitude + "\"," +
-                    "\"passes\": \"" + passes + "\"}");
-            out.flush();
-            out.close();
-
-           passTimeLocation = new Location();
-
-           //TODO: Handle response or do request right
-
-           return passTimeLocation;
-
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-                if (buffer != null) {
-                    buffer.close();
-                }
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-                // ignore
-            }
-        }
-           return passTimeLocation;*/
        }
 
     public String getWeatherData() {
         String weather = null;
-
         return weather;
-
     }
 }

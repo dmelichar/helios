@@ -12,13 +12,16 @@ import at.fhtw.ode.helios.domain.Location;
 import at.fhtw.ode.helios.domain.PeopleInSpace;
 import com.google.gson.JsonElement;
 import com.vaadin.navigator.View;
+import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import org.vaadin.addon.leaflet.LCircle;
@@ -91,7 +94,7 @@ public class MapView extends VerticalLayout implements View {
         Location locationISS = HeliosUI.getDataProvider().getISSLocation();
 
         markerISS.setIcon(FontAwesome.SPACE_SHUTTLE);
-        markerISS.setPopup("ISS Location in the coordinates " + locationISS.getLocation().toString() + " at timestamp " + locationISS.getDate().toString());
+        markerISS.setPopup("ISS Location in the coordinates " + locationISS.getLocation().toString() + " at timestamp: " + locationISS.getDate().toString());
         markerISS.setPoint(locationISS.getLocation());
         map.addComponents(markerISS);
     }
@@ -103,10 +106,25 @@ public class MapView extends VerticalLayout implements View {
     public void peopleInSpaceListener() {
         final Label numberPeople = new Label();
         final Label namesPeople = new Label();
+        ArrayList<String> nameList = new ArrayList<>();
 
+        //TODO: Print only one time or do a popup or something
         PeopleInSpace people = HeliosUI.getDataProvider().getNumberOfPeopleInSpace();
-        numberPeople.setValue("There are " + people.getNumberOfPeople() + " people in space right now, they are: ");
-        namesPeople.setValue(people.getNamesOfPeople().toString());
+        numberPeople.setValue("There are " + people.getNumberOfPeople() + " people in space right now, these are: ");
+
+        int i=0;
+        int iend;
+        for (JsonElement element : people.getNamesOfPeople()) {
+            String str = element.toString().substring(element.toString().indexOf(":") + 2);
+            iend = str.indexOf("\"");
+            if (iend != -1) {
+                str = str.substring(0, iend);
+            }
+            nameList.add(i, str);
+            i++;
+        }
+
+        namesPeople.setValue(nameList.toString().substring(1, nameList.toString().length()-1));
         addComponent(numberPeople);
         addComponent(namesPeople);
     }
@@ -134,9 +152,14 @@ public class MapView extends VerticalLayout implements View {
                 map.addComponents(m, cm, c);
                 map.setLayersToUpdateOnLocate(m, cm, c);
 
+                // ISS Pass Time at users location
                 myLocation.setLocation(event.getPoint());
                 Location risetime = HeliosUI.getDataProvider().getISSPassTimes(myLocation);
-                passTimes.setValue("The next pass time of the ISS at your location is at: " + risetime.getRisetimes(0));
+                String myTime = risetime.getRisetimes(0).toString().substring(risetime.getRisetimes(0).toString().lastIndexOf(":") + 1);
+                myTime = myTime.substring(0, myTime.length() - 1);
+                Instant time = Instant.ofEpochSecond(Long.parseLong(myTime));
+                risetime.setDate(Date.from(time));
+                passTimes.setValue("The next pass time of the ISS at your location is at: " + risetime.getDate().toString());
             }
         });
         addComponent(passTimes);
