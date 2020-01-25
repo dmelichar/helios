@@ -37,7 +37,6 @@ public final class HeliosUI extends UI {
         addStyleName(ValoTheme.UI_WITH_MENU);
 
         updateContent();
-
     }
 
 

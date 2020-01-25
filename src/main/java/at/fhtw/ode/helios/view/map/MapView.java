@@ -1,9 +1,13 @@
 package at.fhtw.ode.helios.view.map;
 
+import java.awt.*;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import at.fhtw.ode.helios.HeliosUI;
 import at.fhtw.ode.helios.domain.Location;
+import at.fhtw.ode.helios.domain.PeopleInSpace;
 import com.vaadin.navigator.View;
 import com.vaadin.server.Responsive;
 import com.vaadin.ui.Button;
@@ -18,6 +22,7 @@ import org.vaadin.addon.leaflet.LCircleMarker;
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LOpenStreetMapLayer;
+import org.vaadin.addon.leaflet.shared.Point;
 
 
 @SuppressWarnings("serial")
@@ -67,19 +72,45 @@ public class MapView extends VerticalLayout implements View {
         saveState.addClickListener((Button.ClickListener) event -> saveStateListener());
         buttonHeader.addComponent(saveState);
 
+        Button peopleInSpace = new Button("People in Space");
+        peopleInSpace.addClickListener((Button.ClickListener) event -> peopleInSpaceListener());
+        buttonHeader.addComponent(peopleInSpace);
+
         return buttonHeader;
     }
 
     public void locateISSListener() {
         final Label iss_pos = new Label();
-        Location location = HeliosUI.getDataProvider().getISSLocation();
+        //final Label passTimes = new Label();
+        final LMarker markerISS = new LMarker();
 
-        iss_pos.setValue(location.toString());
+        //TODO: Icon for ISS Lmarker
+        markerISS.setIcon("ISS");
+
+        Location location = HeliosUI.getDataProvider().getISSLocation();
+        iss_pos.setValue("ISS location: " + new Date().toString() + ": " + location.getLocation().toString());
+        markerISS.setPopup("ISS Location\nTimestamp: " + location.getDate().toString() + "\nCoordinates: " + location.getLocation().toString());
+        markerISS.setPoint(location.getLocation());
+        map.addComponents(markerISS);
+
         addComponent(iss_pos);
+
+        //TODO: Pass times in DataProvider - handle response or do request right
+        //Location risetime = HeliosUI.getDataProvider().getISSPassTimes(location, 1);
+        //passTimes.setValue("The next pass time of the ISS at your location is at: " + risetime.getDate().toString());
+        //addComponent(passTimes);
     }
 
     public void saveStateListener() {
 
+    }
+
+    public void peopleInSpaceListener() {
+        final Label numberPeople = new Label();
+
+        PeopleInSpace people = HeliosUI.getDataProvider().getNumberOfPeopleInSpace();
+        numberPeople.setValue("There are " + people.getNumberOfPeople() + " people in space right now");
+        addComponent(numberPeople);
     }
 
     public void configureMap() {
@@ -91,7 +122,7 @@ public class MapView extends VerticalLayout implements View {
         final LCircle c = new LCircle();
 
         map.addLocateListener(event -> {
-            pos.setValue(new Date().toString() + ": " + event.toString());
+            pos.setValue("Your location: " + new Date().toString() + ": " + event.getPoint().toString());
             if (m.getParent() == null) {
                 m.setPoint(event.getPoint());
                 cm.setPoint(event.getPoint());
@@ -109,5 +140,4 @@ public class MapView extends VerticalLayout implements View {
         // ToDo: save to locations list
         addComponent(pos);
     }
-
 }
