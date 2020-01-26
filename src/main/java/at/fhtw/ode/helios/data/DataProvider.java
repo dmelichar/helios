@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import at.fhtw.ode.helios.domain.PeopleInSpace;
+import at.fhtw.ode.helios.domain.WeatherData;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -32,7 +33,6 @@ import at.fhtw.ode.helios.domain.Location;
 public class DataProvider extends VerticalLayout implements View {
 
     private static final String ISS_API = "http://api.open-notify.org/iss-now.json";
-    private static final String DARKSKY_API = "https://api.darksky.net/forecast/1a8c4d19947f4c72b82a5b76a742aecb/%s,%s";
     private static final String PEOPLE_IN_SPACE_API = "http://api.open-notify.org/astros.json";
 
     private static Multimap<Long, Location> locations;
@@ -161,6 +161,38 @@ public class DataProvider extends VerticalLayout implements View {
         }
 
         return people;
+    }
+
+    public WeatherData getCloudCover(Location myLocation, String timestamp) {
+
+        WeatherData weather = null;
+
+        try {
+            weather = new WeatherData();
+
+            String latitude = "";
+            String longitude = "";
+
+            Pattern pattern = Pattern.compile(", *");
+            Matcher matcher = pattern.matcher(myLocation.getLocation().toString());
+            if (matcher.find()) {
+                latitude = myLocation.getLocation().toString().substring(0, matcher.start());
+                longitude = myLocation.getLocation().toString().substring(matcher.end());
+            }
+
+            String DARKSKY_API = "https://api.darksky.net/forecast/1a8c4d19947f4c72b82a5b76a742aecb/" + latitude + "," + longitude + "," + timestamp;
+            JsonObject response = readJsonFromUrl(DARKSKY_API);
+
+            JsonObject cur = response.get("currently").getAsJsonObject();
+            weather.setSummary(cur.get("summary").getAsString());
+            weather.setCloudCover(cur.get("cloudCover").getAsFloat());
+
+            return weather;
+
+        } catch(IOException e) {
+
+        }
+        return weather;
     }
 
        public Location getISSPassTimes(Location myLocation) {

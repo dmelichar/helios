@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import at.fhtw.ode.helios.HeliosUI;
 import at.fhtw.ode.helios.domain.Location;
 import at.fhtw.ode.helios.domain.PeopleInSpace;
+import at.fhtw.ode.helios.domain.WeatherData;
 import com.google.gson.JsonElement;
 import com.vaadin.navigator.View;
 import com.vaadin.server.BrowserWindowOpener;
@@ -110,7 +111,7 @@ public class MapView extends VerticalLayout implements View {
 
         //TODO: Print only one time or do a popup or something
         PeopleInSpace people = HeliosUI.getDataProvider().getNumberOfPeopleInSpace();
-        numberPeople.setValue("There are " + people.getNumberOfPeople() + " people in space right now, these are: ");
+        numberPeople.setValue("There are " + people.getNumberOfPeople() + " people in space at the ISS craft right now, these are: ");
 
         int i=0;
         int iend;
@@ -125,8 +126,7 @@ public class MapView extends VerticalLayout implements View {
         }
 
         namesPeople.setValue(nameList.toString().substring(1, nameList.toString().length()-1));
-        addComponent(numberPeople);
-        addComponent(namesPeople);
+        addComponents(numberPeople, namesPeople);
     }
 
     public void configureMap() {
@@ -137,6 +137,7 @@ public class MapView extends VerticalLayout implements View {
         final LCircle c = new LCircle();
         Location myLocation = new Location();
         final Label passTimes = new Label();
+        final Label weatherData = new Label();
 
         map.addLocateListener(event -> {
             if (m.getParent() == null) {
@@ -160,9 +161,19 @@ public class MapView extends VerticalLayout implements View {
                 Instant time = Instant.ofEpochSecond(Long.parseLong(myTime));
                 risetime.setDate(Date.from(time));
                 passTimes.setValue("The next pass time of the ISS at your location is at: " + risetime.getDate().toString());
+
+                // Weather Data at users location
+                WeatherData weather = HeliosUI.getDataProvider().getCloudCover(myLocation, myTime);
+                if (weather.getCloudCover() < 0.6) {
+                    weatherData.setValue("Weather at pass time: " + weather.getSummary() + ", clear sky! You should be able to see the International Space Station!");
+                }
+                else {
+                    weatherData.setValue("Weather at pass time: " + weather.getSummary() + ", the sky will be covered with clouds. Detecting the International Space Station will be difficult!");
+                }
             }
         });
         addComponent(passTimes);
+        addComponent(weatherData);
 
         // ToDo: save to locations list
     }
