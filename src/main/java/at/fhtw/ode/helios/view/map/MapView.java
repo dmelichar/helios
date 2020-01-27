@@ -18,6 +18,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.themes.ValoTheme;
 
+import org.springframework.data.domain.Range;
 import org.vaadin.addon.leaflet.LCircle;
 import org.vaadin.addon.leaflet.LCircleMarker;
 import org.vaadin.addon.leaflet.LMap;
@@ -71,7 +72,6 @@ public class MapView extends VerticalLayout implements View {
         locateISS.addClickListener((Button.ClickListener) event -> locateISSListener());
         buttonHeader.addComponent(locateISS);
 
-
         Button peopleInSpace = new Button("People in Space");
         peopleInSpace.addClickListener((Button.ClickListener) event -> peopleInSpaceListener());
         buttonHeader.addComponent(peopleInSpace);
@@ -120,6 +120,15 @@ public class MapView extends VerticalLayout implements View {
 
         namesPeople.setValue(nameList.toString().substring(1, nameList.toString().length()-1));
         addComponents(numberPeople, namesPeople);
+
+        // Create a sub-window and set the content
+        Window subWindow = new Window("Sub-window");
+        VerticalLayout subContent = new VerticalLayout();
+        subWindow.setContent(subContent);
+        subContent.addComponents(numberPeople, namesPeople);
+        subWindow.center();
+        subWindow.setStyleName("People in Space");
+        getUI().addWindow(subWindow);
     }
 
     public void configureMap() {

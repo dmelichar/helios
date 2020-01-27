@@ -232,9 +232,4 @@ public class DataProvider extends VerticalLayout implements View {
 
            return location;
        }
-
-    public String getWeatherData() {
-        String weather = null;
-        return weather;
-    }
 }

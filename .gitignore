@@ -141,4 +141,4 @@ gradle-app.setting
 **/.vscode/
 src/main/webapp/VAADIN/themes/dashboard/styles.scss.cache
 src/main/webapp/VAADIN/widgetsets/
-**/target/
+**/target/:
