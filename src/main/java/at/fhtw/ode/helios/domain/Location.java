@@ -7,9 +7,17 @@ import java.util.Date;
 import com.google.gson.JsonElement;
 import org.vaadin.addon.leaflet.shared.Point;
 
-public final class Location {
+import javax.persistence.*;
 
+
+@Entity
+@Table(name = "locations")
+public class Location extends AbstractEntity {
+
+    @Column(columnDefinition = "POINT")
     private Point location;
+
+    @Temporal(TemporalType.DATE)
     private Date date;
     private ArrayList<JsonElement> risetimes = new ArrayList<JsonElement>();
 

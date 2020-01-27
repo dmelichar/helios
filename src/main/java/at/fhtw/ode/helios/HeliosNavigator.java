@@ -30,8 +30,6 @@ public class HeliosNavigator extends Navigator {
 
             @Override
             public boolean beforeViewChange(final ViewChangeEvent event) {
-                // Since there's no conditions in switching between the views
-                // we can always return true.
                 return true;
             }
 

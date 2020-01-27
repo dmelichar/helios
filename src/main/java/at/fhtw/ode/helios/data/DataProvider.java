@@ -1,20 +1,23 @@
 package at.fhtw.ode.helios.data;
 
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.sql.Time;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import at.fhtw.ode.helios.domain.PeopleInSpace;
 import at.fhtw.ode.helios.domain.WeatherData;
+import at.fhtw.ode.helios.domain.Location;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -24,11 +27,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import com.vaadin.navigator.View;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import org.vaadin.addon.leaflet.shared.Point;
 
-import at.fhtw.ode.helios.domain.Location;
 
 public class DataProvider extends VerticalLayout implements View {
 
@@ -42,8 +43,8 @@ public class DataProvider extends VerticalLayout implements View {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -1);
         if (lastDataUpdate == null || lastDataUpdate.before(cal.getTime())) {
-            refreshStaticData();
-            lastDataUpdate = new Date();
+             refreshStaticData();
+             lastDataUpdate = new Date();
         }
     }
 
@@ -68,11 +69,10 @@ public class DataProvider extends VerticalLayout implements View {
         InputStream is = new URL(url).openStream();
         try {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is,
-                    StandardCharsets.UTF_8));
+                    Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
             JsonElement jelement = new JsonParser().parse(jsonText);
-            JsonObject jobject = jelement.getAsJsonObject();
-            return jobject;
+            return jelement.getAsJsonObject();
         } finally {
             is.close();
         }
@@ -106,6 +106,7 @@ public class DataProvider extends VerticalLayout implements View {
 
 
     public Collection<Location> getRecentLocations(int count) {
+        System.out.println(locations.values());
         List<Location> orderedLocations = Lists.newArrayList(locations.values());
         Collections.sort(orderedLocations, (o1, o2) -> o2.getDate().compareTo((o1.getDate())));
 

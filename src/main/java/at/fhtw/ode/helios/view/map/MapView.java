@@ -1,11 +1,8 @@
 package at.fhtw.ode.helios.view.map;
 
-import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import at.fhtw.ode.helios.HeliosUI;
 import at.fhtw.ode.helios.domain.Location;
@@ -13,16 +10,12 @@ import at.fhtw.ode.helios.domain.PeopleInSpace;
 import at.fhtw.ode.helios.domain.WeatherData;
 import com.google.gson.JsonElement;
 import com.vaadin.navigator.View;
-import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
-import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import org.vaadin.addon.leaflet.LCircle;
@@ -32,7 +25,7 @@ import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LOpenStreetMapLayer;
 import org.vaadin.addon.leaflet.shared.Point;
 
-import javax.swing.*;
+import static at.fhtw.ode.helios.data.DataProvider.timestamp;
 
 
 @SuppressWarnings("serial")
@@ -78,9 +71,6 @@ public class MapView extends VerticalLayout implements View {
         locateISS.addClickListener((Button.ClickListener) event -> locateISSListener());
         buttonHeader.addComponent(locateISS);
 
-        Button saveState = new Button("Save State");
-        saveState.addClickListener((Button.ClickListener) event -> saveStateListener());
-        buttonHeader.addComponent(saveState);
 
         Button peopleInSpace = new Button("People in Space");
         peopleInSpace.addClickListener((Button.ClickListener) event -> peopleInSpaceListener());
@@ -100,8 +90,11 @@ public class MapView extends VerticalLayout implements View {
         map.addComponents(markerISS);
     }
 
-    public void saveStateListener() {
-
+    public void saveStateListener(Point point) {
+        Location location = new Location();
+        location.setDate(timestamp());
+        location.setLocation(point);
+        //HeliosUI.getHeliosRepository().save(location);
     }
 
     public void peopleInSpaceListener() {
@@ -143,6 +136,7 @@ public class MapView extends VerticalLayout implements View {
             if (m.getParent() == null) {
                 m.setPopup("Your Location is in the coordinates " + event.getPoint());
                 m.setPoint(event.getPoint());
+                saveStateListener(event.getPoint());
                 cm.setPoint(event.getPoint());
                 cm.setColor("red");
                 cm.setRadius(1);
@@ -175,6 +169,5 @@ public class MapView extends VerticalLayout implements View {
         addComponent(passTimes);
         addComponent(weatherData);
 
-        // ToDo: save to locations list
     }
 }

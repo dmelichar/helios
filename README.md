@@ -47,5 +47,10 @@ at what time to have a clear view onto the ISS with my telescope?
 ## Running / Installing
 
 ``` bash
-mvn clean install spring-boot:run
+# For GCloud database
+bin/cloud_sql_proxy -instances=black-nihilus:europe-west3:vaadindb=tcp:3306
+
+# To run application
+mvn clean install -U
+mvn spring-boot:run
 ```
