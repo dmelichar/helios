@@ -94,8 +94,7 @@ public class MapView extends VerticalLayout implements View {
         Location location = new Location();
         location.setDate(timestamp());
         location.setLocation(point);
-        HeliosUI.getHeliosRepository().save(location);
-
+        //HeliosUI.getHeliosRepository().save(location);
     }
 
     public void peopleInSpaceListener() {

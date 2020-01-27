@@ -135,3 +135,10 @@ gradle-app.setting
 **/build/
 
 # End of https://www.gitignore.io/api/java,gradle,intellij
+
+**/config/
+**/node_modules/
+**/.vscode/
+src/main/webapp/VAADIN/themes/dashboard/styles.scss.cache
+src/main/webapp/VAADIN/widgetsets/
+**/target/

@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import at.fhtw.ode.helios.event.HeliosRepository;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;

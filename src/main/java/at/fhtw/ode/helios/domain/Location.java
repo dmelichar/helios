@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Table(name = "locations")
 public class Location extends AbstractEntity {
 
-    @Column(columnDefinition = "geometry")
+    @Column(columnDefinition = "POINT")
     private Point location;
 
     @Temporal(TemporalType.DATE)

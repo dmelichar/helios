@@ -28,7 +28,6 @@ import com.google.gson.JsonParser;
 
 import com.vaadin.navigator.View;
 import com.vaadin.ui.VerticalLayout;
-import org.springframework.scheduling.annotation.Async;
 import org.vaadin.addon.leaflet.shared.Point;
 
 
@@ -43,11 +42,10 @@ public class DataProvider extends VerticalLayout implements View {
     public DataProvider() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -1);
-        System.out.println(cal.getTime().toString());
-        // if (lastDataUpdate == null || lastDataUpdate.before(cal.getTime())) {
-        //     refreshStaticData();
-        //     lastDataUpdate = new Date();
-        // }
+        if (lastDataUpdate == null || lastDataUpdate.before(cal.getTime())) {
+             refreshStaticData();
+             lastDataUpdate = new Date();
+        }
     }
 
     private void refreshStaticData() {
@@ -74,8 +72,7 @@ public class DataProvider extends VerticalLayout implements View {
                     Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
             JsonElement jelement = new JsonParser().parse(jsonText);
-            JsonObject jobject = jelement.getAsJsonObject();
-            return jobject;
+            return jelement.getAsJsonObject();
         } finally {
             is.close();
         }
@@ -109,6 +106,7 @@ public class DataProvider extends VerticalLayout implements View {
 
 
     public Collection<Location> getRecentLocations(int count) {
+        System.out.println(locations.values());
         List<Location> orderedLocations = Lists.newArrayList(locations.values());
         Collections.sort(orderedLocations, (o1, o2) -> o2.getDate().compareTo((o1.getDate())));
 
