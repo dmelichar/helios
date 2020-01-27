@@ -24,8 +24,6 @@ public class HeliosSessionInitListener implements SessionInitListener {
                         .attr("name", "apple-mobile-web-app-status-bar-style")
                         .attr("content", "black-translucent");
 
-                String contextPath = response.getRequest().getContextPath();
-
             }
 
             @Override

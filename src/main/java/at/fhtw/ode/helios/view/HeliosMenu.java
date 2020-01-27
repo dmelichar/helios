@@ -74,13 +74,7 @@ public final class HeliosMenu extends CustomComponent {
             setPrimaryStyleName("valo-menu-item");
             setIcon(view.getIcon());
             setCaption(view.getViewName().substring(0, 1).toUpperCase() + view.getViewName().substring(1));
-            addClickListener(new ClickListener() {
-                @Override
-                public void buttonClick(final ClickEvent event) {
-                    UI.getCurrent().getNavigator()
-                            .navigateTo(view.getViewName());
-                }
-            });
+            addClickListener((ClickListener) event -> UI.getCurrent().getNavigator().navigateTo(view.getViewName()));
 
         }
 

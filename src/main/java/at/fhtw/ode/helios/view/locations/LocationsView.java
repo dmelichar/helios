@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import at.fhtw.ode.helios.event.HeliosRepository;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -74,8 +75,8 @@ public class LocationsView extends VerticalLayout implements View {
 
         grid.setColumnReorderingAllowed(false);
 
-        ListDataProvider<Location> dataProvider = com.vaadin.data.provider.DataProvider
-                .ofCollection(HeliosUI.getDataProvider().getRecentLocations(20));
+        ListDataProvider<Location> dataProvider = com.vaadin.data.provider.DataProvider.ofCollection(HeliosUI.getDataProvider().getRecentLocations(20));
+
         grid.setDataProvider(dataProvider);
 
         return grid;

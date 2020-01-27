@@ -1,20 +1,23 @@
 package at.fhtw.ode.helios.data;
 
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.sql.Time;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import at.fhtw.ode.helios.domain.PeopleInSpace;
 import at.fhtw.ode.helios.domain.WeatherData;
+import at.fhtw.ode.helios.domain.Location;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -24,11 +27,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import com.vaadin.navigator.View;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
+import org.springframework.scheduling.annotation.Async;
 import org.vaadin.addon.leaflet.shared.Point;
 
-import at.fhtw.ode.helios.domain.Location;
 
 public class DataProvider extends VerticalLayout implements View {
 
@@ -41,6 +43,7 @@ public class DataProvider extends VerticalLayout implements View {
     public DataProvider() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -1);
+        System.out.println(cal.getTime().toString());
         if (lastDataUpdate == null || lastDataUpdate.before(cal.getTime())) {
             refreshStaticData();
             lastDataUpdate = new Date();
@@ -67,8 +70,7 @@ public class DataProvider extends VerticalLayout implements View {
     private static JsonObject readJsonFromUrl(String url) throws IOException {
         InputStream is = new URL(url).openStream();
         try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is,
-                    StandardCharsets.UTF_8));
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
             JsonElement jelement = new JsonParser().parse(jsonText);
             JsonObject jobject = jelement.getAsJsonObject();
@@ -81,6 +83,11 @@ public class DataProvider extends VerticalLayout implements View {
     /* Time utility method */
     public static Date timestamp() {
         return new Date(ThreadLocalRandom.current().nextInt() * 1000L);
+    }
+
+
+    public void saveLocation(Location point) {
+
     }
 
     private Multimap<Long, Location> generateLocationsData() {
@@ -113,6 +120,7 @@ public class DataProvider extends VerticalLayout implements View {
             Math.min(count, locations.values().size() -1));
     }
 
+    @Async
     public Location getISSLocation() {
         Location location = null;
 
