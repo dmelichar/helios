@@ -44,10 +44,10 @@ public class DataProvider extends VerticalLayout implements View {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -1);
         System.out.println(cal.getTime().toString());
-        if (lastDataUpdate == null || lastDataUpdate.before(cal.getTime())) {
-            refreshStaticData();
-            lastDataUpdate = new Date();
-        }
+        // if (lastDataUpdate == null || lastDataUpdate.before(cal.getTime())) {
+        //     refreshStaticData();
+        //     lastDataUpdate = new Date();
+        // }
     }
 
     private void refreshStaticData() {
@@ -70,7 +70,8 @@ public class DataProvider extends VerticalLayout implements View {
     private static JsonObject readJsonFromUrl(String url) throws IOException {
         InputStream is = new URL(url).openStream();
         try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is,
+                    Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
             JsonElement jelement = new JsonParser().parse(jsonText);
             JsonObject jobject = jelement.getAsJsonObject();
@@ -83,11 +84,6 @@ public class DataProvider extends VerticalLayout implements View {
     /* Time utility method */
     public static Date timestamp() {
         return new Date(ThreadLocalRandom.current().nextInt() * 1000L);
-    }
-
-
-    public void saveLocation(Location point) {
-
     }
 
     private Multimap<Long, Location> generateLocationsData() {
@@ -120,7 +116,6 @@ public class DataProvider extends VerticalLayout implements View {
             Math.min(count, locations.values().size() -1));
     }
 
-    @Async
     public Location getISSLocation() {
         Location location = null;
 
