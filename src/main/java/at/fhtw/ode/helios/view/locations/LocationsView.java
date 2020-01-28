@@ -1,10 +1,22 @@
 package at.fhtw.ode.helios.view.locations;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
+import at.fhtw.ode.helios.view.map.Coord;
+import at.fhtw.ode.helios.view.map.InfoPanel;
+import com.google.api.core.ApiFuture;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.*;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -25,7 +37,7 @@ import at.fhtw.ode.helios.event.HeliosEventBus;
 @SuppressWarnings("serial")
 public class LocationsView extends VerticalLayout implements View {
 
-    public LocationsView() {
+    public LocationsView() throws IOException, ExecutionException, InterruptedException {
         setSizeFull();
         addStyleName("locations");
         setMargin(false);
@@ -59,7 +71,7 @@ public class LocationsView extends VerticalLayout implements View {
         return header;
     }
 
-    public Grid<Location> buildLocationTable() {
+    public Grid<Location> buildLocationTable() throws IOException, ExecutionException, InterruptedException {
         final DateFormat DATEFORMAT = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
         final Set<Column<Location, ?>> collapsibleColumns = new LinkedHashSet<>();
 

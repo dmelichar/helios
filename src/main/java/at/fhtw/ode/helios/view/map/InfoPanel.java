@@ -3,13 +3,27 @@ package at.fhtw.ode.helios.view.map;
 import at.fhtw.ode.helios.HeliosUI;
 import at.fhtw.ode.helios.domain.Location;
 import at.fhtw.ode.helios.domain.Weather;
+import com.google.api.core.ApiFuture;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("serial")
 public class InfoPanel extends Window {
@@ -34,6 +48,8 @@ public class InfoPanel extends Window {
 
         components.addComponent(mainContent);
         components.addComponent(buildFooter());
+
+        writeDB(location);
 
         return components;
     }
@@ -130,5 +146,42 @@ public class InfoPanel extends Window {
         footer.setExpandRatio(cancel, 1);
         footer.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
         return footer;
+    }
+
+    public void writeDB(Location location) {
+        try {
+            // Use a service account
+            InputStream serviceAccount = new FileInputStream("test.json");
+            GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(credentials)
+                    .build();
+            FirebaseApp.initializeApp(options);
+
+            Firestore db = FirestoreClient.getFirestore();
+
+            //asynchronously update doc, create the document if missing
+            Map<String, Object> update = new HashMap<>();
+            update.put("lat", location.getLocation().getLat());
+            update.put("lon", location.getLocation().getLon());
+            update.put("time", new Date().toString());
+            ApiFuture<DocumentReference> writeResult =
+                    db
+                            .collection("coord")
+                            .add(update);
+// ...
+
+//asynchronously retrieve all documents
+            ApiFuture<QuerySnapshot> future = db.collection("coord").get();
+// future.get() blocks on response
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            for (QueryDocumentSnapshot document : documents) {
+                System.out.println(document.getId() + " => " + document.toObject(Coord.class));
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

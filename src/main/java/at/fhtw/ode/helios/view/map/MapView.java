@@ -2,6 +2,9 @@ package at.fhtw.ode.helios.view.map;
 
 import at.fhtw.ode.helios.HeliosUI;
 import at.fhtw.ode.helios.domain.Location;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
@@ -10,6 +13,21 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import org.vaadin.addon.leaflet.*;
 import org.vaadin.addon.leaflet.shared.Point;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Service;
+import com.google.auth.oauth2.GoogleCredentials;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 
 import static at.fhtw.ode.helios.data.DataProvider.timestamp;
 
