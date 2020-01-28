@@ -18,6 +18,8 @@ public class Location extends AbstractEntity {
     //@Temporal(TemporalType.DATE)
     private Date date;
 
+    private String timestamp;
+
     public Point getLocation() {
         return location;
     }
@@ -38,5 +40,11 @@ public class Location extends AbstractEntity {
         return String.format("%s @ %s", Arrays.toString(location.getLatLonPair()), date.toString());
     }
 
+    public String getTimestamp() {
+        return timestamp;
+    }
 
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 }

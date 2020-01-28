@@ -1,9 +1,6 @@
 package at.fhtw.ode.helios.domain;
 
-import org.vaadin.addon.leaflet.shared.Point;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 
 public class InternationalSpaceStation extends AbstractEntity{

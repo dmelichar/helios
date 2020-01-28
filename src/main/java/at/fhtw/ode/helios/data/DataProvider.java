@@ -18,8 +18,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DataProvider {
 
@@ -42,7 +40,7 @@ public class DataProvider {
         }
     }
 
-    private void refreshStaticData() {
+    public void refreshStaticData() {
         locations = generateLocationsData();
         iss = initISS();
     }
@@ -77,15 +75,15 @@ public class DataProvider {
     public InternationalSpaceStation initISS() {
         InternationalSpaceStation builder = new InternationalSpaceStation();
         builder.setPeople(pollPeopleInSpace());
-        builder.setNumberOfPeopleInSpace(pollNumberOfPeopleInSpace());
+        builder.setNumberOfPeopleInSpace(pollPeopleInSpace().size());
         //builder.addLocation(pollCurrentISSLocation());
 
         return builder;
     }
 
-//    public InternationalSpaceStation getCurrentISSLocation() {
-////        return DataProvider.iss;
-////    }
+/*    public InternationalSpaceStation getCurrentISSLocation() {
+        return DataProvider.iss;
+    }*/
 
     public Location pollCurrentISSLocation() {
         Location location = null;
@@ -109,7 +107,9 @@ public class DataProvider {
         return location;
     }
 
-    public Date getISSPassTime(Location myLocation) {
+    public Location getISSPassTime(Location myLocation) {
+        Location result = new Location();
+
         try {
             JsonObject response = readJsonFromUrl(String.format(PASSTIME_API,
                     myLocation.getLocation().getLat().toString(), myLocation.getLocation().getLon()));
@@ -119,30 +119,15 @@ public class DataProvider {
             String time = times.get(0).getAsJsonObject().get("risetime").getAsString();
             Instant instant = Instant.ofEpochSecond(Long.parseLong(time));
 
-            return Date.from(instant);
+            result.setDate(Date.from(instant));
+            result.setTimestamp(time);
+
+            return result;
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
-    }
-
-    public String getISSPassTimeAsString (Location myLocation) {
-        String time = new String();
-        try {
-            JsonObject response = readJsonFromUrl(String.format(PASSTIME_API,
-                    myLocation.getLocation().getLat().toString(), myLocation.getLocation().getLon()));
-
-            JsonArray times = response.get("response").getAsJsonArray();
-
-            time = times.get(0).getAsJsonObject().get("risetime").getAsString();
-
-            return time;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return time;
+        return result;
     }
 
     public String getPeopleinSpace() {
@@ -175,22 +160,6 @@ public class DataProvider {
         return nameList;
     }
 
-    private int pollNumberOfPeopleInSpace() {
-        int number = 0;
-
-        try {
-            JsonObject response = readJsonFromUrl(PEOPLE_IN_SPACE_API);
-            number = response.get("number").getAsInt();
-
-            return number;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return number;
-    }
-
     public Weather pollWeatherData(Location myLocation, String timestamp) {
 
         Weather weather = null;
@@ -198,17 +167,8 @@ public class DataProvider {
         try {
             weather = new Weather();
 
-            String latitude = "";
-            String longitude = "";
-
-            Pattern pattern = Pattern.compile(", *");
-            Matcher matcher = pattern.matcher(myLocation.getLocation().toString());
-            if (matcher.find()) {
-                latitude = myLocation.getLocation().toString().substring(0, matcher.start());
-                longitude = myLocation.getLocation().toString().substring(matcher.end());
-            }
-
-            JsonObject response = readJsonFromUrl(DARKSKY_API + latitude + "," + longitude + "," + timestamp);
+            JsonObject response = readJsonFromUrl(DARKSKY_API
+                    + myLocation.getLocation().getLat().toString() + "," + myLocation.getLocation().getLon().toString() + "," + timestamp);
 
             JsonObject cur = response.get("currently").getAsJsonObject();
             weather.setSummary(cur.get("summary").getAsString());

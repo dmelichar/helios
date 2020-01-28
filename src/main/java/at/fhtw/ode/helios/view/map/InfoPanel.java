@@ -3,8 +3,6 @@ package at.fhtw.ode.helios.view.map;
 import at.fhtw.ode.helios.HeliosUI;
 import at.fhtw.ode.helios.domain.Location;
 import at.fhtw.ode.helios.domain.Weather;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ContentMode;
@@ -27,15 +25,11 @@ public class InfoPanel extends Window {
     }
 
     private Component buildContent(Location location) {
-        Location myLocation = new Location();
-        myLocation.setDate(null);
-        myLocation.setLocation(location.getLocation());
 
         VerticalLayout components = new VerticalLayout();
-        //components.setMargin(true);
 
         HorizontalLayout mainContent = new HorizontalLayout();
-        mainContent.addComponent(buildLocationResult(myLocation));
+        mainContent.addComponent(buildLocationResult(location));
         mainContent.addComponent(buildWeatherInfo(location));
 
         components.addComponent(mainContent);
@@ -60,7 +54,7 @@ public class InfoPanel extends Window {
         weatherResult.addComponent(weatherTitle);
 
         Label weatherInfo = new Label();
-        Weather weather = HeliosUI.getDataProvider().pollWeatherData(location, HeliosUI.getDataProvider().getISSPassTimeAsString(location));
+        Weather weather = HeliosUI.getDataProvider().pollWeatherData(location, HeliosUI.getDataProvider().getISSPassTime(location).getTimestamp());
 
         if (weather.getCloudCover() < 0.5) {
             weatherInfo.setValue(weather.getSummary() + ". Not many clouds cover the sky! You should be able to spot the International Space Station!");
@@ -70,7 +64,7 @@ public class InfoPanel extends Window {
         }
 
         weatherResult.addComponent(weatherInfo);
-        //weatherComponents.addComponent(weatherResult);
+        weatherComponents.addComponent(weatherResult);
 
         return weatherResult;
     }
@@ -86,13 +80,12 @@ public class InfoPanel extends Window {
         Label locationLabel = new Label(location.getLocation().toString());
         locationResult.addComponent(locationLabel);
 
-
         Label passTimeTitel = new Label("Next ISS pass");
         passTimeTitel.addStyleName(ValoTheme.LABEL_H3);
         passTimeTitel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         locationResult.addComponent(passTimeTitel);
 
-        Date time = HeliosUI.getDataProvider().getISSPassTime(location);
+        Date time = HeliosUI.getDataProvider().getISSPassTime(location).getDate();
         Label passTime = new Label(time.toString());
         locationResult.addComponent(passTime);
         return locationResult;
@@ -112,5 +105,4 @@ public class InfoPanel extends Window {
         footer.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
         return footer;
     }
-
 }

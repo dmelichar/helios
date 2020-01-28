@@ -71,7 +71,7 @@ public class MapView extends VerticalLayout implements View {
         Location locationISS = HeliosUI.getDataProvider().pollCurrentISSLocation();
 
         markerISS.setIcon(FontAwesome.SPACE_SHUTTLE);
-        markerISS.setPopup("ISS Location in the coordinates " + locationISS.getLocation().toString() + " at timestamp: " + locationISS.getDate().toString());
+        markerISS.setPopup("ISS Location in the coordinates " + locationISS.getLocation() + " at timestamp: " + locationISS.getDate());
         markerISS.setPoint(locationISS.getLocation());
         map.addComponents(markerISS);
     }
