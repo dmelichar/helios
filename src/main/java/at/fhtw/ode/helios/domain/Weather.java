@@ -5,6 +5,8 @@ public final class Weather extends AbstractEntity {
     private String summary;
     private float cloudCover;
     private String icon;
+    private float temperature;
+    private float visibility;
 
     public String getSummary() {
         return summary;
@@ -28,5 +30,21 @@ public final class Weather extends AbstractEntity {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public float getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(float temperature) {
+        this.temperature = temperature;
+    }
+
+    public float getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(float visibility) {
+        this.visibility = visibility;
     }
 }

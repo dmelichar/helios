@@ -76,14 +76,9 @@ public class DataProvider {
         InternationalSpaceStation builder = new InternationalSpaceStation();
         builder.setPeople(pollPeopleInSpace());
         builder.setNumberOfPeopleInSpace(pollPeopleInSpace().size());
-        //builder.addLocation(pollCurrentISSLocation());
 
         return builder;
     }
-
-/*    public InternationalSpaceStation getCurrentISSLocation() {
-        return DataProvider.iss;
-    }*/
 
     public Location pollCurrentISSLocation() {
         Location location = null;
@@ -174,6 +169,8 @@ public class DataProvider {
             weather.setSummary(cur.get("summary").getAsString());
             weather.setCloudCover(cur.get("cloudCover").getAsFloat());
             weather.setIcon(cur.get("icon").getAsString());
+            weather.setTemperature(cur.get("temperature").getAsFloat());
+            weather.setVisibility(cur.get("visibility").getAsFloat());
 
             return weather;
 

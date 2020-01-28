@@ -13,13 +13,15 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.icons.VaadinIcons;
-import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.server.FileResource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,8 +35,6 @@ public class InfoPanel extends Window {
         setModal(true);
         setClosable(false);
         setResizable(false);
-        //setWidth(1200.0f, Unit.PIXELS);
-
         setContent(buildContent(location));
     }
 
@@ -55,58 +55,125 @@ public class InfoPanel extends Window {
     }
 
     private Component buildWeatherInfo(Location location) {
-        //HorizontalLayout weatherComponents = new HorizontalLayout();
-        Label image = new Label();
         Label weatherInfo = new Label();
+        Label cloudInfo = new Label();
         VerticalLayout weatherResult = new VerticalLayout();
 
+        // Get weather data
         Weather weather = HeliosUI.getDataProvider().pollWeatherData(location, HeliosUI.getDataProvider().getISSPassTime(location).getTimestamp());
 
+        // Set title
         Label weatherTitle = new Label("Weather data at pass time");
         weatherTitle.addStyleName(ValoTheme.LABEL_H3);
         weatherTitle.addStyleName(ValoTheme.LABEL_NO_MARGIN);
-        weatherResult.addComponent(weatherTitle);
+        weatherResult.addComponents(weatherTitle);
 
-        image.setContentMode(ContentMode.HTML);
-        image.addStyleName("big-icon");
-        image.setSizeFull();
+        // Set weather data labels
+        float celsius = ((weather.getTemperature()-32)*5/9);
+        celsius = round(celsius);
+        float visibility = weather.getVisibility();
+        visibility = round(visibility);
 
-        if (weather.getCloudCover() < 0.5) {
-            weatherInfo.setValue(weather.getSummary() + ". Not many clouds cover the sky! You should be able to spot the International Space Station!");
+        if (visibility >= 10) {
+            weatherInfo.setValue(weather.getSummary() + ". " + celsius + " degrees celsius and the average visibility is more than " + visibility + " miles.");
         }
         else {
-            weatherInfo.setValue(weather.getSummary() + ". Many clouds cover the sky! Detecting the International Space Station will be very difficult!");
+            weatherInfo.setValue(weather.getSummary() + ". " + celsius + " degrees celsius and the average visibility is " + visibility + " miles.");
         }
+        if (weather.getCloudCover() < 0.5) {
+            cloudInfo.setValue("Not many clouds cover the sky! You should be able to spot the International Space Station!");
+        }
+        else {
+            cloudInfo.setValue("Many clouds cover the sky! Detecting the International Space Station will be very difficult!");
+        }
+        weatherResult.addComponent(weatherInfo);
+        weatherResult.addComponent(cloudInfo);
 
+        // Find the application directory
+        String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+
+        // TODO: Find good icons and right sizes
+        // Image as a file resource
+        FileResource resourceClearDay = new FileResource(new File(basepath + "/WEB-INF/images/ClearDay.png"));
+        FileResource resourceClearNight = new FileResource(new File(basepath + "/WEB-INF/images/ClearNight.png"));
+        FileResource resourceCloudy = new FileResource(new File(basepath + "/WEB-INF/images/Cloudy.png"));
+        FileResource resourceUmbrella = new FileResource(new File(basepath + "/WEB-INF/images/Umbrella.png"));
+        FileResource resourceWind = new FileResource(new File(basepath + "/WEB-INF/images/Wind.png"));
+        FileResource resourceDark = new FileResource(new File(basepath + "/WEB-INF/images/Dark.png"));
+        FileResource resourceSnow = new FileResource(new File(basepath + "/WEB-INF/images/Snow.png"));
+        FileResource resourceFog = new FileResource(new File(basepath + "/WEB-INF/images/Fog.png"));
+        FileResource resourcePartlyCloudyDay = new FileResource(new File(basepath + "/WEB-INF/images/partlyCloudyDay.png"));
+        FileResource resourcePartlyCloudyNight = new FileResource(new File(basepath + "/WEB-INF/images/partlyCloudyNight.png"));
+
+        // Show the image in the application
+        Image clearDayImage = new Image(null, resourceClearDay);
+        Image clearNightImage = new Image(null, resourceClearNight);
+        Image cloudyImage = new Image(null, resourceCloudy);
+        Image umbrellaImage = new Image(null, resourceUmbrella);
+        Image windImage = new Image(null, resourceWind);
+        Image darkImage = new Image(null, resourceDark);
+        Image snowImage = new Image(null, resourceSnow);
+        Image fogImage = new Image(null, resourceFog);
+        Image partlyCloudyDayImage = new Image(null, resourcePartlyCloudyDay);
+        Image partlyCloudyNightImage = new Image(null, resourcePartlyCloudyNight);
+
+        // Set image sizes
+        clearDayImage.setWidth(128.0f, Unit.PIXELS);
+        clearNightImage.setWidth(128.0f, Unit.PIXELS);
+        cloudyImage.setWidth(128.0f, Unit.PIXELS);
+        umbrellaImage.setWidth(128.0f, Unit.PIXELS);
+        windImage.setWidth(128.0f, Unit.PIXELS);
+        darkImage.setWidth(128.0f, Unit.PIXELS);
+        snowImage.setWidth(128.0f, Unit.PIXELS);
+        fogImage.setWidth(128.0f, Unit.PIXELS);
+        partlyCloudyDayImage.setWidth(128.0f, Unit.PIXELS);
+        partlyCloudyNightImage.setWidth(128.0f, Unit.PIXELS);
+
+        // Select the correct icon
         switch (weather.getIcon()) {
             case "clear-day":
+                weatherResult.addComponent(clearDayImage);
+                weatherResult.setComponentAlignment(clearDayImage, Alignment.BOTTOM_CENTER);
+                break;
             case "clear-night":
-                image.setValue(VaadinIcons.SUN_O.getHtml());
+                weatherResult.addComponent(clearNightImage);
+                weatherResult.setComponentAlignment(clearNightImage, Alignment.BOTTOM_CENTER);
                 break;
             case "rain":
+                weatherResult.addComponent(umbrellaImage);
+                weatherResult.setComponentAlignment(umbrellaImage, Alignment.BOTTOM_CENTER);
+                break;
             case "snow":
+                weatherResult.addComponent(snowImage);
+                weatherResult.setComponentAlignment(snowImage, Alignment.BOTTOM_CENTER);
+                break;
             case "sleet":
-                image.setValue(VaadinIcons.UMBRELLA.getHtml());
+                weatherResult.addComponent(darkImage);
+                weatherResult.setComponentAlignment(darkImage, Alignment.BOTTOM_CENTER);
                 break;
             case "wind":
-                image.setValue(VaadinIcons.ACADEMY_CAP.getHtml());
+                weatherResult.addComponent(windImage);
+                weatherResult.setComponentAlignment(windImage, Alignment.BOTTOM_CENTER);
                 break;
             case "fog":
+                weatherResult.addComponent(fogImage);
+                weatherResult.setComponentAlignment(fogImage, Alignment.BOTTOM_CENTER);
+                break;
             case "cloudy":
+                weatherResult.addComponent(cloudyImage);
+                weatherResult.setComponentAlignment(cloudyImage, Alignment.BOTTOM_CENTER);
+                break;
             case "partly-cloudy-day":
+                weatherResult.addComponent(partlyCloudyDayImage);
+                weatherResult.setComponentAlignment(partlyCloudyDayImage, Alignment.BOTTOM_CENTER);
+                break;
             case "partly-cloudy-night":
-                image.setValue(VaadinIcons.CLOUD.getHtml());
+                weatherResult.addComponent(partlyCloudyNightImage);
+                weatherResult.setComponentAlignment(partlyCloudyNightImage, Alignment.BOTTOM_CENTER);
                 break;
             default:
-                image.setValue(VaadinIcons.ARROWS_CROSS.getHtml());
                 break;
         }
-
-        weatherResult.addComponent(weatherInfo);
-        weatherResult.addComponent(image);
-        //weatherResult.setComponentAlignment(image, Alignment.MIDDLE_CENTER);
-        //weatherComponents.addComponent(image);
-        //weatherComponents.addComponent(weatherResult);
 
         return weatherResult;
     }
@@ -146,6 +213,12 @@ public class InfoPanel extends Window {
         footer.setExpandRatio(cancel, 1);
         footer.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
         return footer;
+    }
+
+    public static float round (float input) {
+        BigDecimal roundedCelsius = new BigDecimal(Float.toString(input));
+        roundedCelsius = roundedCelsius.setScale(2, BigDecimal.ROUND_HALF_UP);
+        return roundedCelsius.floatValue();
     }
 
     public void writeDB(Location location) {
