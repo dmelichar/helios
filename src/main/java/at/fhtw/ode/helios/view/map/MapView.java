@@ -16,6 +16,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.themes.ValoTheme;
 
+import org.springframework.data.domain.Range;
 import org.vaadin.addon.leaflet.LCircle;
 import org.vaadin.addon.leaflet.LCircleMarker;
 import org.vaadin.addon.leaflet.LMap;
@@ -81,6 +82,10 @@ public class MapView extends VerticalLayout implements View {
         markerISS.setPopup("ISS Location in the coordinates " + locationISS.getLocation().toString() + " at timestamp: " + locationISS.getDate().toString());
         markerISS.setPoint(locationISS.getLocation());
         map.addComponents(markerISS);
+
+
+        Label people = new Label(HeliosUI.getDataProvider().getPeopleinSpace());
+        addComponent(people);
     }
 
     public void saveStateListener(Point point) {

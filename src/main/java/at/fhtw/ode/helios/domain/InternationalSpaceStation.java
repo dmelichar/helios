@@ -29,6 +29,7 @@ public class InternationalSpaceStation extends AbstractEntity{
         this.locations.add(location);
     }
 
-
-
+    public String getPeopleAsStrings() {
+        return people.toString();
+    }
 }

@@ -115,6 +115,10 @@ public class DataProvider {
         return null;
     }
 
+    public String getPeopleinSpace() {
+        return DataProvider.iss.getPeopleAsStrings();
+    }
+
     private Location pollCurrentISSLocation() {
         Location location = null;
 
