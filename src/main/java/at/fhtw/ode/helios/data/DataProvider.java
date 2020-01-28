@@ -40,7 +40,7 @@ public class DataProvider {
         }
     }
 
-    public void refreshStaticData() {
+    private void refreshStaticData() {
         locations = generateLocationsData();
         iss = initISS();
     }
@@ -173,6 +173,7 @@ public class DataProvider {
             JsonObject cur = response.get("currently").getAsJsonObject();
             weather.setSummary(cur.get("summary").getAsString());
             weather.setCloudCover(cur.get("cloudCover").getAsFloat());
+            weather.setIcon(cur.get("icon").getAsString());
 
             return weather;
 

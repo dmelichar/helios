@@ -4,6 +4,7 @@ public final class Weather extends AbstractEntity {
 
     private String summary;
     private float cloudCover;
+    private String icon;
 
     public String getSummary() {
         return summary;
@@ -19,5 +20,13 @@ public final class Weather extends AbstractEntity {
 
     public void setCloudCover(float cloudCover) {
         this.cloudCover = cloudCover;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }

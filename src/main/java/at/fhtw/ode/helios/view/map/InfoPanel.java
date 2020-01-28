@@ -39,22 +39,21 @@ public class InfoPanel extends Window {
     }
 
     private Component buildWeatherInfo(Location location) {
-        HorizontalLayout weatherComponents = new HorizontalLayout();
+        //HorizontalLayout weatherComponents = new HorizontalLayout();
         Label image = new Label();
-        image.setContentMode(ContentMode.HTML);
-        image.setValue(VaadinIcons.EYE.getHtml());
-        image.addStyleName("big-icon");
-        weatherComponents.addComponent(image);
-
+        Label weatherInfo = new Label();
         VerticalLayout weatherResult = new VerticalLayout();
+
+        Weather weather = HeliosUI.getDataProvider().pollWeatherData(location, HeliosUI.getDataProvider().getISSPassTime(location).getTimestamp());
 
         Label weatherTitle = new Label("Weather data at pass time");
         weatherTitle.addStyleName(ValoTheme.LABEL_H3);
         weatherTitle.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         weatherResult.addComponent(weatherTitle);
 
-        Label weatherInfo = new Label();
-        Weather weather = HeliosUI.getDataProvider().pollWeatherData(location, HeliosUI.getDataProvider().getISSPassTime(location).getTimestamp());
+        image.setContentMode(ContentMode.HTML);
+        image.addStyleName("big-icon");
+        image.setSizeFull();
 
         if (weather.getCloudCover() < 0.5) {
             weatherInfo.setValue(weather.getSummary() + ". Not many clouds cover the sky! You should be able to spot the International Space Station!");
@@ -63,8 +62,35 @@ public class InfoPanel extends Window {
             weatherInfo.setValue(weather.getSummary() + ". Many clouds cover the sky! Detecting the International Space Station will be very difficult!");
         }
 
+        switch (weather.getIcon()) {
+            case "clear-day":
+            case "clear-night":
+                image.setValue(VaadinIcons.SUN_O.getHtml());
+                break;
+            case "rain":
+            case "snow":
+            case "sleet":
+                image.setValue(VaadinIcons.UMBRELLA.getHtml());
+                break;
+            case "wind":
+                image.setValue(VaadinIcons.ACADEMY_CAP.getHtml());
+                break;
+            case "fog":
+            case "cloudy":
+            case "partly-cloudy-day":
+            case "partly-cloudy-night":
+                image.setValue(VaadinIcons.CLOUD.getHtml());
+                break;
+            default:
+                image.setValue(VaadinIcons.ARROWS_CROSS.getHtml());
+                break;
+        }
+
         weatherResult.addComponent(weatherInfo);
-        weatherComponents.addComponent(weatherResult);
+        weatherResult.addComponent(image);
+        //weatherResult.setComponentAlignment(image, Alignment.MIDDLE_CENTER);
+        //weatherComponents.addComponent(image);
+        //weatherComponents.addComponent(weatherResult);
 
         return weatherResult;
     }
