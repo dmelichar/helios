@@ -13,7 +13,6 @@ import org.vaadin.addon.leaflet.shared.Point;
 
 import static at.fhtw.ode.helios.data.DataProvider.timestamp;
 
-
 @SuppressWarnings("serial")
 public class MapView extends VerticalLayout implements View {
 
@@ -113,7 +112,7 @@ public class MapView extends VerticalLayout implements View {
 
         map.addLocateListener(event -> {
             if (m.getParent() == null) {
-                m.setPopup("Your Location: " + event.getPoint());
+                m.setPopup("Your Location is in the coordinates " + event.getPoint());
                 m.setPoint(event.getPoint());
                 saveStateListener(event.getPoint());
                 cm.setPoint(event.getPoint());

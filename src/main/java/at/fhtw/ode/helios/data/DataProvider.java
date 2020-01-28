@@ -14,7 +14,6 @@ import org.vaadin.addon.leaflet.shared.Point;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
@@ -85,8 +84,8 @@ public class DataProvider {
     }
 
 //    public InternationalSpaceStation getCurrentISSLocation() {
-//        return DataProvider.iss;
-//    }
+////        return DataProvider.iss;
+////    }
 
     public Location pollCurrentISSLocation() {
         Location location = null;
@@ -112,7 +111,6 @@ public class DataProvider {
 
     public Date getISSPassTime(Location myLocation) {
         try {
-
             JsonObject response = readJsonFromUrl(String.format(PASSTIME_API,
                     myLocation.getLocation().getLat().toString(), myLocation.getLocation().getLon()));
 
@@ -127,6 +125,24 @@ public class DataProvider {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String getISSPassTimeAsString (Location myLocation) {
+        String time = new String();
+        try {
+            JsonObject response = readJsonFromUrl(String.format(PASSTIME_API,
+                    myLocation.getLocation().getLat().toString(), myLocation.getLocation().getLon()));
+
+            JsonArray times = response.get("response").getAsJsonArray();
+
+            time = times.get(0).getAsJsonObject().get("risetime").getAsString();
+
+            return time;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return time;
     }
 
     public String getPeopleinSpace() {
@@ -175,7 +191,7 @@ public class DataProvider {
         return number;
     }
 
-    public Weather pollWeatherData(Location myLocation) {
+    public Weather pollWeatherData(Location myLocation, String timestamp) {
 
         Weather weather = null;
 
@@ -192,7 +208,7 @@ public class DataProvider {
                 longitude = myLocation.getLocation().toString().substring(matcher.end());
             }
 
-            JsonObject response = readJsonFromUrl(DARKSKY_API + latitude + "," + longitude);
+            JsonObject response = readJsonFromUrl(DARKSKY_API + latitude + "," + longitude + "," + timestamp);
 
             JsonObject cur = response.get("currently").getAsJsonObject();
             weather.setSummary(cur.get("summary").getAsString());

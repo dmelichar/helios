@@ -3,6 +3,8 @@ package at.fhtw.ode.helios.view.map;
 import at.fhtw.ode.helios.HeliosUI;
 import at.fhtw.ode.helios.domain.Location;
 import at.fhtw.ode.helios.domain.Weather;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ContentMode;
@@ -58,13 +60,13 @@ public class InfoPanel extends Window {
         weatherResult.addComponent(weatherTitle);
 
         Label weatherInfo = new Label();
-        Weather weather = HeliosUI.getDataProvider().pollWeatherData(location);
+        Weather weather = HeliosUI.getDataProvider().pollWeatherData(location, HeliosUI.getDataProvider().getISSPassTimeAsString(location));
 
-        if (weather.getCloudCover() < 0.6) {
-            weatherInfo.setValue(weather.getSummary() + ", not many clouds cover the sky! You should be able to spot the International Space Station!");
+        if (weather.getCloudCover() < 0.5) {
+            weatherInfo.setValue(weather.getSummary() + ". Not many clouds cover the sky! You should be able to spot the International Space Station!");
         }
         else {
-            weatherInfo.setValue(weather.getSummary() + ", many clouds cover the sky! Detecting the International Space Station will be very difficult!");
+            weatherInfo.setValue(weather.getSummary() + ". Many clouds cover the sky! Detecting the International Space Station will be very difficult!");
         }
 
         weatherResult.addComponent(weatherInfo);
