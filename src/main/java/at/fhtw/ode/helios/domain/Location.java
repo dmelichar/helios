@@ -14,12 +14,11 @@ import javax.persistence.*;
 @Table(name = "locations")
 public class Location extends AbstractEntity {
 
-    @Column(columnDefinition = "POINT")
+    //@Column(columnDefinition = "POINT")
     private Point location;
 
-    @Temporal(TemporalType.DATE)
+    //@Temporal(TemporalType.DATE)
     private Date date;
-    private ArrayList<JsonElement> risetimes = new ArrayList<JsonElement>();
 
     public Point getLocation() {
         return location;
@@ -36,17 +35,10 @@ public class Location extends AbstractEntity {
     public void setLocation(Point location) {
         this.location = location;
     }
-
-    public JsonElement getRisetimes(int index) {
-        return risetimes.get(index);
-    }
-
-    public void setRisetimes(ArrayList<JsonElement> risetimes) {
-        this.risetimes = risetimes;
-    }
-
     @Override
     public String toString() {
         return String.format("%s @ %s", Arrays.toString(location.getLatLonPair()), date.toString());
     }
+
+
 }

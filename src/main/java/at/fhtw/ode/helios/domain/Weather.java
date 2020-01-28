@@ -1,6 +1,6 @@
 package at.fhtw.ode.helios.domain;
 
-public final class WeatherData {
+public final class Weather extends AbstractEntity {
 
     private String summary;
     private float cloudCover;

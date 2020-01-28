@@ -14,9 +14,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import at.fhtw.ode.helios.domain.PeopleInSpace;
-import at.fhtw.ode.helios.domain.WeatherData;
+import at.fhtw.ode.helios.domain.InternationalSpaceStation;
 import at.fhtw.ode.helios.domain.Location;
+import at.fhtw.ode.helios.domain.Weather;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -30,57 +30,39 @@ import com.vaadin.navigator.View;
 import com.vaadin.ui.VerticalLayout;
 import org.vaadin.addon.leaflet.shared.Point;
 
+public class DataProvider {
 
-public class DataProvider extends VerticalLayout implements View {
-
-    private static final String ISS_API = "http://api.open-notify.org/iss-now.json";
+    private static final String LOCATION_API = "http://api.open-notify.org/iss-now.json";
     private static final String PEOPLE_IN_SPACE_API = "http://api.open-notify.org/astros.json";
+    private static final String PASSTIME_API = "http://api.open-notify.org/iss-pass.json?lat=%s&lon=%s";
+    private static final String DARKSKY_API = "https://api.darksky.net/forecast/1a8c4d19947f4c72b82a5b76a742aecb/%s,%s,%s";
 
     private static Multimap<Long, Location> locations;
+    private static InternationalSpaceStation iss;
+
     private static Date lastDataUpdate;
 
     public DataProvider() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -1);
         if (lastDataUpdate == null || lastDataUpdate.before(cal.getTime())) {
-             refreshStaticData();
-             lastDataUpdate = new Date();
+            refreshStaticData();
+            lastDataUpdate = new Date();
         }
     }
 
     private void refreshStaticData() {
         locations = generateLocationsData();
-
+        iss = initISS();
     }
 
-    /* JSON utility method */
-    private static String readAll(Reader rd) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        int cp;
-        while ((cp = rd.read()) != -1) {
-            sb.append((char) cp);
-        }
-        return sb.toString();
-    }
+    public InternationalSpaceStation initISS() {
+        InternationalSpaceStation builder = null;
+        builder = new InternationalSpaceStation();
+        builder.setPeople(pollPeopleInSpace());
+        builder.addLocation(pollCurrentISSLocation());
 
-
-    /* JSON utility method */
-    private static JsonObject readJsonFromUrl(String url) throws IOException {
-        InputStream is = new URL(url).openStream();
-        try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is,
-                    Charset.forName("UTF-8")));
-            String jsonText = readAll(rd);
-            JsonElement jelement = new JsonParser().parse(jsonText);
-            return jelement.getAsJsonObject();
-        } finally {
-            is.close();
-        }
-    }
-
-    /* Time utility method */
-    public static Date timestamp() {
-        return new Date(ThreadLocalRandom.current().nextInt() * 1000L);
+        return builder;
     }
 
     private Multimap<Long, Location> generateLocationsData() {
@@ -100,26 +82,45 @@ public class DataProvider extends VerticalLayout implements View {
             result.put(i, location);
         }
 
-
         return result;
     }
 
-
     public Collection<Location> getRecentLocations(int count) {
-        System.out.println(locations.values());
         List<Location> orderedLocations = Lists.newArrayList(locations.values());
         Collections.sort(orderedLocations, (o1, o2) -> o2.getDate().compareTo((o1.getDate())));
 
-        return orderedLocations.subList(0,
-            Math.min(count, locations.values().size() -1));
+        return orderedLocations.subList(0, Math.min(count, locations.values().size() - 1));
     }
 
-    public Location getISSLocation() {
+    public Location getCurrentISSLocation() {
+        return DataProvider.iss.getLocations().getLast();
+    }
+
+    public Date getISSPassTime(Location myLocation) {
+        try {
+
+            JsonObject response = readJsonFromUrl(String.format(PASSTIME_API,
+                    myLocation.getLocation().getLat().toString(), myLocation.getLocation().getLon()));
+
+            JsonArray times = response.get("response").getAsJsonArray();
+
+            String time = times.get(0).getAsJsonObject().get("risetime").getAsString();
+            Instant instant = Instant.ofEpochSecond(Long.parseLong(time));
+
+            return Date.from(instant);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Location pollCurrentISSLocation() {
         Location location = null;
 
         try {
             location = new Location();
-            JsonObject response = readJsonFromUrl(ISS_API);
+            JsonObject response = readJsonFromUrl(LOCATION_API);
 
             Instant time = Instant.ofEpochSecond(response.get("timestamp").getAsLong());
             location.setDate(Date.from(time));
@@ -129,47 +130,41 @@ public class DataProvider extends VerticalLayout implements View {
 
             return location;
 
-        } catch(IOException e) {
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return location;
     }
 
-    public PeopleInSpace getNumberOfPeopleInSpace() {
-
-        PeopleInSpace people = null;
+    private ArrayList<String> pollPeopleInSpace() {
+        ArrayList<String> nameList = null;
 
         try {
-            people = new PeopleInSpace();
+            nameList = new ArrayList<>();
             JsonObject response = readJsonFromUrl(PEOPLE_IN_SPACE_API);
+            JsonArray peopleList = response.get("people").getAsJsonArray();
 
-            int number = response.get("number").getAsInt();
-            people.setNumberOfPeople(number);
-
-            ArrayList<JsonElement> namesOfPeople = new ArrayList<>();
-            JsonArray names = response.get("people").getAsJsonArray();
-
-            for (JsonElement jsonElement : names) {
-                namesOfPeople.add(jsonElement);
+            for (JsonElement peopleObjects : peopleList) {
+               JsonObject people = peopleObjects.getAsJsonObject();
+               nameList.add(people.get("name").getAsString());
             }
 
-            people.setNamesOfPeople(namesOfPeople);
-            return people;
+            return nameList;
 
-        } catch(IOException e) {
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        return people;
+        return nameList;
     }
 
-    public WeatherData getCloudCover(Location myLocation, String timestamp) {
+    private Weather pollCloudCover(Location myLocation, String timestamp) {
 
-        WeatherData weather = null;
+        Weather weather = null;
 
         try {
-            weather = new WeatherData();
+            weather = new Weather();
 
             String latitude = "";
             String longitude = "";
@@ -181,8 +176,7 @@ public class DataProvider extends VerticalLayout implements View {
                 longitude = myLocation.getLocation().toString().substring(matcher.end());
             }
 
-            String DARKSKY_API = "https://api.darksky.net/forecast/1a8c4d19947f4c72b82a5b76a742aecb/" + latitude + "," + longitude + "," + timestamp;
-            JsonObject response = readJsonFromUrl(DARKSKY_API);
+            JsonObject response = readJsonFromUrl(String.format(DARKSKY_API, latitude, longitude, timestamp));
 
             JsonObject cur = response.get("currently").getAsJsonObject();
             weather.setSummary(cur.get("summary").getAsString());
@@ -190,51 +184,37 @@ public class DataProvider extends VerticalLayout implements View {
 
             return weather;
 
-        } catch(IOException e) {
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return weather;
     }
 
-       public Location getISSPassTimes(Location myLocation) {
+    /* JSON utility method */
+    private static String readAll(Reader rd) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int cp;
+        while ((cp = rd.read()) != -1) {
+            sb.append((char) cp);
+        }
+        return sb.toString();
+    }
 
-           Location location = null;
+    /* JSON utility method */
+    private static JsonObject readJsonFromUrl(String url) throws IOException {
+        InputStream is = new URL(url).openStream();
+        try {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String jsonText = readAll(rd);
+            JsonElement jelement = new JsonParser().parse(jsonText);
+            return jelement.getAsJsonObject();
+        } finally {
+            is.close();
+        }
+    }
 
-           try {
-               String latitude = "";
-               String longitude = "";
-
-               Pattern pattern = Pattern.compile(", *");
-               Matcher matcher = pattern.matcher(myLocation.getLocation().toString());
-               if (matcher.find()) {
-                   latitude = myLocation.getLocation().toString().substring(0, matcher.start());
-                   longitude = myLocation.getLocation().toString().substring(matcher.end());
-               }
-
-               String ISS_PASS_TIMES_API = "http://api.open-notify.org/iss-pass.json?lat=" + latitude + "&lon=" + longitude;
-
-               location = new Location();
-               JsonObject response = readJsonFromUrl(ISS_PASS_TIMES_API);
-
-               ArrayList<JsonElement> risetimes = new ArrayList<>();
-               JsonArray times = response.get("response").getAsJsonArray();
-
-               for (JsonElement jsonElement : times) {
-                   risetimes.add(jsonElement);
-               }
-
-               location.setRisetimes(risetimes);
-               return location;
-
-           } catch(IOException e) {
-
-           }
-
-           return location;
-       }
-
-    public String getWeatherData() {
-        String weather = null;
-        return weather;
+    /* Time utility method */
+    public static Date timestamp() {
+        return new Date(ThreadLocalRandom.current().nextInt() * 1000L);
     }
 }
