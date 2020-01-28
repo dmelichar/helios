@@ -1,13 +1,11 @@
 package at.fhtw.ode.helios.domain;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-
-import com.google.gson.JsonElement;
 import org.vaadin.addon.leaflet.shared.Point;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.Arrays;
+import java.util.Date;
 
 
 @Entity

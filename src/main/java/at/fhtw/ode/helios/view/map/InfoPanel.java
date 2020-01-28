@@ -1,49 +1,40 @@
 package at.fhtw.ode.helios.view.map;
 
-import java.time.Instant;
-import java.util.Date;
-
-import com.vaadin.client.ui.Icon;
+import at.fhtw.ode.helios.HeliosUI;
+import at.fhtw.ode.helios.domain.Location;
+import at.fhtw.ode.helios.domain.Weather;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ContentMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 
-import org.vaadin.addon.leaflet.shared.Point;
-
-import at.fhtw.ode.helios.HeliosUI;
-import at.fhtw.ode.helios.domain.Location;
+import java.util.Date;
 
 @SuppressWarnings("serial")
 public class InfoPanel extends Window {
 
-    public InfoPanel(Point pos) {
-        setCaption("Information");
+    public InfoPanel(Location location) {
+        setCaption("Your location information");
         setModal(true);
         setClosable(false);
         setResizable(false);
-        setWidth(600.0f, Unit.PIXELS);
+        //setWidth(1200.0f, Unit.PIXELS);
 
-        setContent(buildContent(pos));
+        setContent(buildContent(location));
     }
 
-    private Component buildContent(Point pos) {
-        Location location = new Location();
-        location.setDate(null);
-        location.setLocation(pos);
+    private Component buildContent(Location location) {
+        Location myLocation = new Location();
+        myLocation.setDate(null);
+        myLocation.setLocation(location.getLocation());
 
         VerticalLayout components = new VerticalLayout();
+        //components.setMargin(true);
 
         HorizontalLayout mainContent = new HorizontalLayout();
-        mainContent.addComponent(buildWeatherInfo());
-        mainContent.addComponent(buildLocationResult(location));
+        mainContent.addComponent(buildLocationResult(myLocation));
+        mainContent.addComponent(buildWeatherInfo(location));
 
         components.addComponent(mainContent);
         components.addComponent(buildFooter());
@@ -51,7 +42,7 @@ public class InfoPanel extends Window {
         return components;
     }
 
-    private Component buildWeatherInfo() {
+    private Component buildWeatherInfo(Location location) {
         HorizontalLayout weatherComponents = new HorizontalLayout();
         Label image = new Label();
         image.setContentMode(ContentMode.HTML);
@@ -60,11 +51,26 @@ public class InfoPanel extends Window {
         weatherComponents.addComponent(image);
 
         VerticalLayout weatherResult = new VerticalLayout();
-        Label test = new Label("test");
-        weatherResult.addComponent(test);
-        weatherComponents.addComponent(weatherResult);
 
-        return weatherComponents;
+        Label weatherTitle = new Label("Weather data at pass time");
+        weatherTitle.addStyleName(ValoTheme.LABEL_H3);
+        weatherTitle.addStyleName(ValoTheme.LABEL_NO_MARGIN);
+        weatherResult.addComponent(weatherTitle);
+
+        Label weatherInfo = new Label();
+        Weather weather = HeliosUI.getDataProvider().pollWeatherData(location);
+
+        if (weather.getCloudCover() < 0.6) {
+            weatherInfo.setValue(weather.getSummary() + ", not many clouds cover the sky! You should be able to spot the International Space Station!");
+        }
+        else {
+            weatherInfo.setValue(weather.getSummary() + ", many clouds cover the sky! Detecting the International Space Station will be very difficult!");
+        }
+
+        weatherResult.addComponent(weatherInfo);
+        //weatherComponents.addComponent(weatherResult);
+
+        return weatherResult;
     }
 
     private Component buildLocationResult(Location location) {

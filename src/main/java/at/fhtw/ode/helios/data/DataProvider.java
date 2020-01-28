@@ -1,23 +1,8 @@
 package at.fhtw.ode.helios.data;
 
-import java.io.*;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import at.fhtw.ode.helios.domain.InternationalSpaceStation;
 import at.fhtw.ode.helios.domain.Location;
 import at.fhtw.ode.helios.domain.Weather;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -25,17 +10,24 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import com.vaadin.navigator.View;
-import com.vaadin.ui.VerticalLayout;
 import org.vaadin.addon.leaflet.shared.Point;
+
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DataProvider {
 
     private static final String LOCATION_API = "http://api.open-notify.org/iss-now.json";
     private static final String PEOPLE_IN_SPACE_API = "http://api.open-notify.org/astros.json";
     private static final String PASSTIME_API = "http://api.open-notify.org/iss-pass.json?lat=%s&lon=%s";
-    private static final String DARKSKY_API = "https://api.darksky.net/forecast/1a8c4d19947f4c72b82a5b76a742aecb/%s,%s,%s";
+    private static final String DARKSKY_API = "https://api.darksky.net/forecast/1a8c4d19947f4c72b82a5b76a742aecb/";
 
     private static Multimap<Long, Location> locations;
     private static InternationalSpaceStation iss;
@@ -54,15 +46,6 @@ public class DataProvider {
     private void refreshStaticData() {
         locations = generateLocationsData();
         iss = initISS();
-    }
-
-    public InternationalSpaceStation initISS() {
-        InternationalSpaceStation builder = null;
-        builder = new InternationalSpaceStation();
-        builder.setPeople(pollPeopleInSpace());
-        builder.addLocation(pollCurrentISSLocation());
-
-        return builder;
     }
 
     private Multimap<Long, Location> generateLocationsData() {
@@ -87,13 +70,44 @@ public class DataProvider {
 
     public Collection<Location> getRecentLocations(int count) {
         List<Location> orderedLocations = Lists.newArrayList(locations.values());
-        Collections.sort(orderedLocations, (o1, o2) -> o2.getDate().compareTo((o1.getDate())));
+        orderedLocations.sort((o1, o2) -> o2.getDate().compareTo((o1.getDate())));
 
         return orderedLocations.subList(0, Math.min(count, locations.values().size() - 1));
     }
 
-    public Location getCurrentISSLocation() {
-        return DataProvider.iss.getLocations().getLast();
+    public InternationalSpaceStation initISS() {
+        InternationalSpaceStation builder = new InternationalSpaceStation();
+        builder.setPeople(pollPeopleInSpace());
+        builder.setNumberOfPeopleInSpace(pollNumberOfPeopleInSpace());
+        //builder.addLocation(pollCurrentISSLocation());
+
+        return builder;
+    }
+
+//    public InternationalSpaceStation getCurrentISSLocation() {
+//        return DataProvider.iss;
+//    }
+
+    public Location pollCurrentISSLocation() {
+        Location location = null;
+
+        try {
+            location = new Location();
+            JsonObject response = readJsonFromUrl(LOCATION_API);
+
+            Instant time = Instant.ofEpochSecond(response.get("timestamp").getAsLong());
+            location.setDate(Date.from(time));
+
+            JsonObject pos = response.get("iss_position").getAsJsonObject();
+            location.setLocation(new Point(pos.get("latitude").getAsDouble(), pos.get("longitude").getAsDouble()));
+
+            return location;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return location;
     }
 
     public Date getISSPassTime(Location myLocation) {
@@ -119,26 +133,8 @@ public class DataProvider {
         return DataProvider.iss.getPeopleAsStrings();
     }
 
-    private Location pollCurrentISSLocation() {
-        Location location = null;
-
-        try {
-            location = new Location();
-            JsonObject response = readJsonFromUrl(LOCATION_API);
-
-            Instant time = Instant.ofEpochSecond(response.get("timestamp").getAsLong());
-            location.setDate(Date.from(time));
-
-            JsonObject pos = response.get("iss_position").getAsJsonObject();
-            location.setLocation(new Point(pos.get("latitude").getAsDouble(), pos.get("longitude").getAsDouble()));
-
-            return location;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return location;
+    public int getNumberOfPeopleInSpace () {
+        return DataProvider.iss.getNumberOfPeopleInSpace();
     }
 
     private ArrayList<String> pollPeopleInSpace() {
@@ -150,8 +146,8 @@ public class DataProvider {
             JsonArray peopleList = response.get("people").getAsJsonArray();
 
             for (JsonElement peopleObjects : peopleList) {
-               JsonObject people = peopleObjects.getAsJsonObject();
-               nameList.add(people.get("name").getAsString());
+                JsonObject people = peopleObjects.getAsJsonObject();
+                nameList.add(people.get("name").getAsString());
             }
 
             return nameList;
@@ -163,7 +159,23 @@ public class DataProvider {
         return nameList;
     }
 
-    private Weather pollCloudCover(Location myLocation, String timestamp) {
+    private int pollNumberOfPeopleInSpace() {
+        int number = 0;
+
+        try {
+            JsonObject response = readJsonFromUrl(PEOPLE_IN_SPACE_API);
+            number = response.get("number").getAsInt();
+
+            return number;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return number;
+    }
+
+    public Weather pollWeatherData(Location myLocation) {
 
         Weather weather = null;
 
@@ -180,7 +192,7 @@ public class DataProvider {
                 longitude = myLocation.getLocation().toString().substring(matcher.end());
             }
 
-            JsonObject response = readJsonFromUrl(String.format(DARKSKY_API, latitude, longitude, timestamp));
+            JsonObject response = readJsonFromUrl(DARKSKY_API + latitude + "," + longitude);
 
             JsonObject cur = response.get("currently").getAsJsonObject();
             weather.setSummary(cur.get("summary").getAsString());
@@ -208,7 +220,7 @@ public class DataProvider {
     private static JsonObject readJsonFromUrl(String url) throws IOException {
         InputStream is = new URL(url).openStream();
         try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String jsonText = readAll(rd);
             JsonElement jelement = new JsonParser().parse(jsonText);
             return jelement.getAsJsonObject();

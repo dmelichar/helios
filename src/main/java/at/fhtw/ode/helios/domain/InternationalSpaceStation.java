@@ -1,13 +1,16 @@
 package at.fhtw.ode.helios.domain;
 
+import org.vaadin.addon.leaflet.shared.Point;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 
 public class InternationalSpaceStation extends AbstractEntity{
 
-    private ArrayList<String> people = new ArrayList<String>();
-    private LinkedList<Location> locations = new LinkedList<Location>();
-
+    private ArrayList<String> people = new ArrayList<>();
+    private int numberOfPeopleInSpace;
+    private LinkedList<Location> locations = new LinkedList<>();
 
     public LinkedList<Location> getLocations() {
         return locations;
@@ -31,5 +34,13 @@ public class InternationalSpaceStation extends AbstractEntity{
 
     public String getPeopleAsStrings() {
         return people.toString();
+    }
+
+    public int getNumberOfPeopleInSpace() {
+        return numberOfPeopleInSpace;
+    }
+
+    public void setNumberOfPeopleInSpace(int numberOfPeopleInSpace) {
+        this.numberOfPeopleInSpace = numberOfPeopleInSpace;
     }
 }
