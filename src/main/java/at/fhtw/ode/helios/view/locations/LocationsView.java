@@ -45,7 +45,7 @@ public class LocationsView extends VerticalLayout implements View {
         header.addStyleName("viewheader");
         Responsive.makeResponsive(header);
 
-        Label title = new Label("Previous locations");
+        Label title = new Label("My previous locations");
         title.setSizeUndefined();
         title.addStyleName(ValoTheme.LABEL_H1);
         title.addStyleName(ValoTheme.LABEL_NO_MARGIN);
@@ -55,7 +55,7 @@ public class LocationsView extends VerticalLayout implements View {
     }
 
     public Grid<Location> buildLocationTable() {
-        final DateFormat DATEFORMAT = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
+        final DateFormat DATEFORMAT = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss z");
         final Set<Column<Location, ?>> collapsibleColumns = new LinkedHashSet<>();
 
         Grid<Location> grid = new Grid<>();

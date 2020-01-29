@@ -3,7 +3,6 @@ package at.fhtw.ode.helios;
 import com.vaadin.server.*;
 import org.jsoup.nodes.Element;
 
-
 public class HeliosSessionInitListener implements SessionInitListener {
 
     @Override
@@ -23,7 +22,6 @@ public class HeliosSessionInitListener implements SessionInitListener {
                 head.appendElement("meta")
                         .attr("name", "apple-mobile-web-app-status-bar-style")
                         .attr("content", "black-translucent");
-
             }
 
             @Override

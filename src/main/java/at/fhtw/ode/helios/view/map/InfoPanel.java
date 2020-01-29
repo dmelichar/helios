@@ -60,7 +60,7 @@ public class InfoPanel extends Window {
         VerticalLayout weatherResult = new VerticalLayout();
 
         // Get weather data
-        Weather weather = HeliosUI.getDataProvider().pollWeatherData(location, HeliosUI.getDataProvider().getISSPassTime(location).getTimestamp());
+        Weather weather = HeliosUI.getDataProvider().pollWeatherData(location, HeliosUI.getDataProvider().pollISSPassTime(location).getTimestamp());
 
         // Set title
         Label weatherTitle = new Label("Weather data at pass time");
@@ -92,14 +92,13 @@ public class InfoPanel extends Window {
         // Find the application directory
         String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 
-        // TODO: Find good icons and right sizes
         // Image as a file resource
         FileResource resourceClearDay = new FileResource(new File(basepath + "/WEB-INF/images/ClearDay.png"));
         FileResource resourceClearNight = new FileResource(new File(basepath + "/WEB-INF/images/ClearNight.png"));
         FileResource resourceCloudy = new FileResource(new File(basepath + "/WEB-INF/images/Cloudy.png"));
-        FileResource resourceUmbrella = new FileResource(new File(basepath + "/WEB-INF/images/Umbrella.png"));
+        FileResource resourceRain = new FileResource(new File(basepath + "/WEB-INF/images/Rain.png"));
         FileResource resourceWind = new FileResource(new File(basepath + "/WEB-INF/images/Wind.png"));
-        FileResource resourceDark = new FileResource(new File(basepath + "/WEB-INF/images/Dark.png"));
+        FileResource resourceSleet = new FileResource(new File(basepath + "/WEB-INF/images/Sleet.png"));
         FileResource resourceSnow = new FileResource(new File(basepath + "/WEB-INF/images/Snow.png"));
         FileResource resourceFog = new FileResource(new File(basepath + "/WEB-INF/images/Fog.png"));
         FileResource resourcePartlyCloudyDay = new FileResource(new File(basepath + "/WEB-INF/images/partlyCloudyDay.png"));
@@ -109,27 +108,15 @@ public class InfoPanel extends Window {
         Image clearDayImage = new Image(null, resourceClearDay);
         Image clearNightImage = new Image(null, resourceClearNight);
         Image cloudyImage = new Image(null, resourceCloudy);
-        Image umbrellaImage = new Image(null, resourceUmbrella);
+        Image rainImage = new Image(null, resourceRain);
         Image windImage = new Image(null, resourceWind);
-        Image darkImage = new Image(null, resourceDark);
+        Image sleetImage = new Image(null, resourceSleet);
         Image snowImage = new Image(null, resourceSnow);
         Image fogImage = new Image(null, resourceFog);
         Image partlyCloudyDayImage = new Image(null, resourcePartlyCloudyDay);
         Image partlyCloudyNightImage = new Image(null, resourcePartlyCloudyNight);
 
-        // Set image sizes
-        clearDayImage.setWidth(128.0f, Unit.PIXELS);
-        clearNightImage.setWidth(128.0f, Unit.PIXELS);
-        cloudyImage.setWidth(128.0f, Unit.PIXELS);
-        umbrellaImage.setWidth(128.0f, Unit.PIXELS);
-        windImage.setWidth(128.0f, Unit.PIXELS);
-        darkImage.setWidth(128.0f, Unit.PIXELS);
-        snowImage.setWidth(128.0f, Unit.PIXELS);
-        fogImage.setWidth(128.0f, Unit.PIXELS);
-        partlyCloudyDayImage.setWidth(128.0f, Unit.PIXELS);
-        partlyCloudyNightImage.setWidth(128.0f, Unit.PIXELS);
-
-        // Select the correct icon
+        // Set the correct icon
         switch (weather.getIcon()) {
             case "clear-day":
                 weatherResult.addComponent(clearDayImage);
@@ -140,16 +127,16 @@ public class InfoPanel extends Window {
                 weatherResult.setComponentAlignment(clearNightImage, Alignment.BOTTOM_CENTER);
                 break;
             case "rain":
-                weatherResult.addComponent(umbrellaImage);
-                weatherResult.setComponentAlignment(umbrellaImage, Alignment.BOTTOM_CENTER);
+                weatherResult.addComponent(rainImage);
+                weatherResult.setComponentAlignment(rainImage, Alignment.BOTTOM_CENTER);
                 break;
             case "snow":
                 weatherResult.addComponent(snowImage);
                 weatherResult.setComponentAlignment(snowImage, Alignment.BOTTOM_CENTER);
                 break;
             case "sleet":
-                weatherResult.addComponent(darkImage);
-                weatherResult.setComponentAlignment(darkImage, Alignment.BOTTOM_CENTER);
+                weatherResult.addComponent(sleetImage);
+                weatherResult.setComponentAlignment(sleetImage, Alignment.BOTTOM_CENTER);
                 break;
             case "wind":
                 weatherResult.addComponent(windImage);
@@ -194,7 +181,7 @@ public class InfoPanel extends Window {
         passTimeTitel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         locationResult.addComponent(passTimeTitel);
 
-        Date time = HeliosUI.getDataProvider().getISSPassTime(location).getDate();
+        Date time = HeliosUI.getDataProvider().pollISSPassTime(location).getDate();
         Label passTime = new Label(time.toString());
         locationResult.addComponent(passTime);
         return locationResult;

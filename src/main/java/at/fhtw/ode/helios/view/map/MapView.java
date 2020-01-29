@@ -2,6 +2,8 @@ package at.fhtw.ode.helios.view.map;
 
 import at.fhtw.ode.helios.HeliosUI;
 import at.fhtw.ode.helios.domain.Location;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -14,11 +16,13 @@ import com.vaadin.ui.themes.ValoTheme;
 import org.vaadin.addon.leaflet.*;
 
 import java.io.File;
+import java.util.Date;
 
 @SuppressWarnings("serial")
 public class MapView extends VerticalLayout implements View {
 
     private LMap map;
+    private static long locationMapCounter = 0;
 
     public MapView() {
         setSizeFull();
@@ -39,6 +43,7 @@ public class MapView extends VerticalLayout implements View {
 
         configureMap();
         createWindow();
+        saveLocation();
     }
 
     public Component buildHeader() {
@@ -86,15 +91,11 @@ public class MapView extends VerticalLayout implements View {
         String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
         FileResource astronautResource = new FileResource(new File(basepath + "/WEB-INF/images/Astronaut.png"));
         Image astronautImage = new Image(null, astronautResource);
-        astronautImage.setWidth(72.0f, Unit.PIXELS);
+        astronautImage.setWidth(64.0f, Unit.PIXELS);
 
         // Create a sub-window and set the content
         Window subWindow = new Window("Astronauts");
         VerticalLayout subContent = new VerticalLayout();
-
-        HorizontalLayout footer = new HorizontalLayout();
-        footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
-        footer.setWidth(100.0f, Unit.PERCENTAGE);
 
         subWindow.setContent(subContent);
         subWindow.center();
@@ -102,13 +103,21 @@ public class MapView extends VerticalLayout implements View {
         subWindow.setClosable(false);
         subWindow.setResizable(false);
 
+        // Footer
+        HorizontalLayout footer = new HorizontalLayout();
+        footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
+        footer.setWidth(100.0f, Unit.PERCENTAGE);
+
+        // Close Button
         Button cancel = new Button("Close");
         cancel.addClickListener(event -> subWindow.close());
         cancel.setClickShortcut(ShortcutAction.KeyCode.ESCAPE, null);
 
-        footer.addComponents(cancel);
+        // Set components
+        footer.addComponents(astronautImage, cancel);
         footer.setExpandRatio(cancel, 1);
-        footer.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
+        footer.setComponentAlignment(cancel, Alignment.BOTTOM_RIGHT);
+        footer.setComponentAlignment(astronautImage, Alignment.BOTTOM_LEFT);
 
         subContent.addComponents(number, people, astronautImage, footer);
         subContent.setComponentAlignment(astronautImage, Alignment.MIDDLE_CENTER);
@@ -141,10 +150,26 @@ public class MapView extends VerticalLayout implements View {
     }
 
     public void createWindow () {
+
         map.addLocateListener(event -> {
             Location myLocation = new Location();
             myLocation.setLocation(event.getPoint());
             getUI().addWindow(new InfoPanel(myLocation));
         });
+    }
+
+        public void saveLocation () {
+        Multimap<Long, Location> locationMultimap = MultimapBuilder.hashKeys().arrayListValues().build();
+
+        //TODO: Fix bug: First location is not saved
+        map.addLocateListener(event -> {
+            Location myLocation = new Location();
+            myLocation.setLocation(event.getPoint());
+            myLocation.setDate(new Date());
+            locationMultimap.put(locationMapCounter, myLocation);
+            locationMapCounter++;
+        });
+
+        HeliosUI.getDataProvider().generateLocationsMap(locationMultimap);
     }
 }

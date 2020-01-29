@@ -5,7 +5,6 @@ import at.fhtw.ode.helios.domain.Location;
 import at.fhtw.ode.helios.domain.Weather;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,7 +16,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class DataProvider {
 
@@ -27,7 +25,7 @@ public class DataProvider {
     private static final String DARKSKY_API = "https://api.darksky.net/forecast/1a8c4d19947f4c72b82a5b76a742aecb/";
 
     private static Multimap<Long, Location> locations;
-    private static InternationalSpaceStation iss;
+    private static InternationalSpaceStation issData;
 
     private static Date lastDataUpdate;
 
@@ -35,49 +33,29 @@ public class DataProvider {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -1);
         if (lastDataUpdate == null || lastDataUpdate.before(cal.getTime())) {
-            refreshStaticData();
+            refreshISSData();
             lastDataUpdate = new Date();
         }
     }
 
-    private void refreshStaticData() {
-        locations = generateLocationsData();
-        iss = initISS();
+    private void refreshISSData() {
+        issData = initISS();
     }
 
-    private Multimap<Long, Location> generateLocationsData() {
-        Multimap<Long, Location> result = MultimapBuilder.hashKeys().arrayListValues().build();
-
-        // between -90 and 90 and -180 and 180
-        for (long i = 0; i <= 100; i++) {
-            Location location = new Location();
-
-            Date random = DataProvider.timestamp();
-            location.setDate(random);
-
-            double lon = ThreadLocalRandom.current().nextDouble(-90, 90);
-            double lat = ThreadLocalRandom.current().nextDouble(-180, 180);
-            location.setLocation(new Point(lat, lon));
-
-            result.put(i, location);
-        }
-
-        return result;
+    public void generateLocationsMap (Multimap<Long, Location> locationMultimap) {
+        locations = locationMultimap;
     }
 
     public Collection<Location> getRecentLocations(int count) {
         List<Location> orderedLocations = Lists.newArrayList(locations.values());
         orderedLocations.sort((o1, o2) -> o2.getDate().compareTo((o1.getDate())));
-
         return orderedLocations.subList(0, Math.min(count, locations.values().size() - 1));
     }
 
     public InternationalSpaceStation initISS() {
         InternationalSpaceStation builder = new InternationalSpaceStation();
-
         builder.setPeople(pollPeopleInSpace());
         builder.setNumberOfPeopleInSpace(pollPeopleInSpace().size());
-
         return builder;
     }
 
@@ -99,11 +77,10 @@ public class DataProvider {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return location;
     }
 
-    public Location getISSPassTime(Location myLocation) {
+    public Location pollISSPassTime(Location myLocation) {
         Location result = new Location();
 
         try {
@@ -127,11 +104,11 @@ public class DataProvider {
     }
 
     public String getPeopleinSpace() {
-        return DataProvider.iss.getPeopleAsStrings();
+        return DataProvider.issData.getPeopleAsStrings();
     }
 
     public int getNumberOfPeopleInSpace () {
-        return DataProvider.iss.getNumberOfPeopleInSpace();
+        return DataProvider.issData.getNumberOfPeopleInSpace();
     }
 
     private ArrayList<String> pollPeopleInSpace() {
@@ -152,12 +129,10 @@ public class DataProvider {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return nameList;
     }
 
     public Weather pollWeatherData(Location myLocation, String timestamp) {
-
         Weather weather = null;
 
         try {
@@ -199,10 +174,5 @@ public class DataProvider {
             JsonElement jelement = new JsonParser().parse(jsonText);
             return jelement.getAsJsonObject();
         }
-    }
-
-    /* Time utility method */
-    public static Date timestamp() {
-        return new Date(ThreadLocalRandom.current().nextInt() * 1000L);
     }
 }

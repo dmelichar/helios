@@ -50,5 +50,4 @@ public enum HeliosViewType {
         }
         return result;
     }
-
 }

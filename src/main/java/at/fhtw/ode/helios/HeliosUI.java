@@ -58,7 +58,6 @@ public final class HeliosUI extends UI {
         return ((HeliosUI) getCurrent()).dataProvider;
     }
 
-
     public static HeliosEventBus getHeliosEventbus() {
         return ((HeliosUI) getCurrent()).heliosEventbus;
     }
