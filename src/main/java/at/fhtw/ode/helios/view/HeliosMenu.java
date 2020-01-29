@@ -1,7 +1,5 @@
 package at.fhtw.ode.helios.view;
 
-import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -10,7 +8,6 @@ import com.vaadin.ui.themes.ValoTheme;
 public final class HeliosMenu extends CustomComponent {
 
     public static final String ID = "helios-menu";
-    private static final String STYLE_VISIBLE = "valo-menu-visible";
 
     public HeliosMenu() {
         setPrimaryStyleName("valo-menu");
@@ -62,21 +59,13 @@ public final class HeliosMenu extends CustomComponent {
         super.attach();
     }
 
-
-    public final class ValoMenuItemButton extends Button {
-
-        private static final String STYLE_SELECTED = "selected";
-
-        private final HeliosViewType view;
+    public static final class ValoMenuItemButton extends Button {
 
         public ValoMenuItemButton(final HeliosViewType view) {
-            this.view = view;
             setPrimaryStyleName("valo-menu-item");
             setIcon(view.getIcon());
             setCaption(view.getViewName().substring(0, 1).toUpperCase() + view.getViewName().substring(1));
             addClickListener((ClickListener) event -> UI.getCurrent().getNavigator().navigateTo(view.getViewName()));
-
         }
-
     }
 }

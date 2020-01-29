@@ -74,6 +74,7 @@ public class DataProvider {
 
     public InternationalSpaceStation initISS() {
         InternationalSpaceStation builder = new InternationalSpaceStation();
+
         builder.setPeople(pollPeopleInSpace());
         builder.setNumberOfPeopleInSpace(pollPeopleInSpace().size());
 
@@ -192,14 +193,11 @@ public class DataProvider {
 
     /* JSON utility method */
     private static JsonObject readJsonFromUrl(String url) throws IOException {
-        InputStream is = new URL(url).openStream();
-        try {
+        try (InputStream is = new URL(url).openStream()) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String jsonText = readAll(rd);
             JsonElement jelement = new JsonParser().parse(jsonText);
             return jelement.getAsJsonObject();
-        } finally {
-            is.close();
         }
     }
 

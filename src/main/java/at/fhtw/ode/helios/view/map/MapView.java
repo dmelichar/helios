@@ -3,15 +3,17 @@ package at.fhtw.ode.helios.view.map;
 import at.fhtw.ode.helios.HeliosUI;
 import at.fhtw.ode.helios.domain.Location;
 import com.vaadin.event.ShortcutAction;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
+import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import org.vaadin.addon.leaflet.*;
-import org.vaadin.addon.leaflet.shared.Point;
 
-import static at.fhtw.ode.helios.data.DataProvider.timestamp;
+import java.io.File;
 
 @SuppressWarnings("serial")
 public class MapView extends VerticalLayout implements View {
@@ -58,7 +60,8 @@ public class MapView extends VerticalLayout implements View {
         locateISS.addClickListener((Button.ClickListener) event -> locateISSListener());
         buttonHeader.addComponent(locateISS);
 
-        Button astronatusCheck = new Button("Astronauts check");
+        Button astronatusCheck = new Button("Astronaut check");
+        astronatusCheck.setIcon(VaadinIcons.ROCKET);
         astronatusCheck.addClickListener((Button.ClickListener) event -> peopleInSpace());
         buttonHeader.addComponent(astronatusCheck);
 
@@ -80,27 +83,37 @@ public class MapView extends VerticalLayout implements View {
         Label number = new Label("There are " + HeliosUI.getDataProvider().getNumberOfPeopleInSpace() + " people at the ISS craft in space right now.");
         Label people = new Label("These are: " + HeliosUI.getDataProvider().getPeopleinSpace().substring(1, HeliosUI.getDataProvider().getPeopleinSpace().length()-1));
 
+        String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+        FileResource astronautResource = new FileResource(new File(basepath + "/WEB-INF/images/Astronaut.png"));
+        Image astronautImage = new Image(null, astronautResource);
+        astronautImage.setWidth(72.0f, Unit.PIXELS);
+
         // Create a sub-window and set the content
         Window subWindow = new Window("Astronauts");
         VerticalLayout subContent = new VerticalLayout();
+
+        HorizontalLayout footer = new HorizontalLayout();
+        footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
+        footer.setWidth(100.0f, Unit.PERCENTAGE);
+
         subWindow.setContent(subContent);
         subWindow.center();
         subWindow.setModal(true);
         subWindow.setClosable(false);
         subWindow.setResizable(false);
+
         Button cancel = new Button("Close");
         cancel.addClickListener(event -> subWindow.close());
         cancel.setClickShortcut(ShortcutAction.KeyCode.ESCAPE, null);
-        subContent.addComponents(number, people, cancel);
-        subContent.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
-        getUI().addWindow(subWindow);
-    }
 
-    public void saveStateListener(Point point) {
-        Location location = new Location();
-        location.setDate(timestamp());
-        location.setLocation(point);
-        //HeliosUI.getHeliosRepository().save(location);
+        footer.addComponents(cancel);
+        footer.setExpandRatio(cancel, 1);
+        footer.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
+
+        subContent.addComponents(number, people, astronautImage, footer);
+        subContent.setComponentAlignment(astronautImage, Alignment.MIDDLE_CENTER);
+
+        getUI().addWindow(subWindow);
     }
 
     public void configureMap() {
@@ -114,7 +127,6 @@ public class MapView extends VerticalLayout implements View {
             if (m.getParent() == null) {
                 m.setPopup("Your Location is in the coordinates " + event.getPoint());
                 m.setPoint(event.getPoint());
-                saveStateListener(event.getPoint());
                 cm.setPoint(event.getPoint());
                 cm.setColor("red");
                 cm.setRadius(1);

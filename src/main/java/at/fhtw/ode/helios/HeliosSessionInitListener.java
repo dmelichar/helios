@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element;
 public class HeliosSessionInitListener implements SessionInitListener {
 
     @Override
-    public final void sessionInit(final SessionInitEvent event) throws ServiceException {
+    public final void sessionInit(final SessionInitEvent event) {
 
         event.getSession().addBootstrapListener(new BootstrapListener() {
 

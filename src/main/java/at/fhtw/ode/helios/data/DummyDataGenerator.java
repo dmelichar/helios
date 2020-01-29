@@ -28,7 +28,7 @@ public class DummyDataGenerator {
                 "ro", "soft", "wa", "re", "lo", "gi", "is", "acc", "el", "tes",
                 "la", "ko", "ni", "ka", "so", "ny", "mi", "nol", "ta", "pa",
                 "na", "so", "nic", "sa", "les", "for", "ce"};
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; i++) {
             String p = part[(int) (Math.random() * part.length)];
             if (i == 0 && capitalized) {
@@ -41,7 +41,7 @@ public class DummyDataGenerator {
     }
 
     public static String randomText(int words) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int sentenceWordsLeft = 0;
         while (words-- > 0) {
             if (sb.length() > 0) {
@@ -69,7 +69,7 @@ public class DummyDataGenerator {
     }
 
     static String randomTitle(int words) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int len = (int) (Math.random() * 4) + 1;
         sb.append(randomWord(len, true));
         while (--words > 0) {
@@ -81,7 +81,7 @@ public class DummyDataGenerator {
     }
 
     static String randomHTML(int words) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (words > 0) {
             sb.append("<h2>");
             int len = (int) (Math.random() * 4) + 1;

@@ -42,7 +42,6 @@ public final class HeliosUI extends UI {
         updateContent();
     }
 
-
     private void updateContent() {
         setContent(new MainView());
         getNavigator().navigateTo(getNavigator().getState());
@@ -63,7 +62,6 @@ public final class HeliosUI extends UI {
     public static HeliosEventBus getHeliosEventbus() {
         return ((HeliosUI) getCurrent()).heliosEventbus;
     }
-
 
     public static HeliosRepository getHeliosRepository() {
         return ((HeliosUI) getCurrent()).heliosRepository;

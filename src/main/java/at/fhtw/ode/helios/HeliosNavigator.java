@@ -1,8 +1,8 @@
 package at.fhtw.ode.helios;
 
+import at.fhtw.ode.helios.event.HeliosEvent;
 import at.fhtw.ode.helios.event.HeliosEventBus;
 import at.fhtw.ode.helios.view.HeliosViewType;
-import at.fhtw.ode.helios.event.HeliosEvent;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -21,9 +21,7 @@ public class HeliosNavigator extends Navigator {
 
         initViewChangeListener();
         initViewProviders();
-
     }
-
 
     private void initViewChangeListener() {
         addViewChangeListener(new ViewChangeListener() {
@@ -40,7 +38,6 @@ public class HeliosNavigator extends Navigator {
                 HeliosEventBus.post(new HeliosEvent.PostViewChangeEvent(view));
                 HeliosEventBus.post(new HeliosEvent.BrowserResizeEvent());
                 HeliosEventBus.post(new HeliosEvent.CloseOpenWindowsEvent());
-
             }
         });
     }

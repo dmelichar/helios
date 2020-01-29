@@ -1,43 +1,26 @@
 package at.fhtw.ode.helios.view.locations;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-
-import at.fhtw.ode.helios.view.map.Coord;
-import at.fhtw.ode.helios.view.map.InfoPanel;
-import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.*;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.cloud.FirestoreClient;
+import at.fhtw.ode.helios.HeliosUI;
+import at.fhtw.ode.helios.domain.Location;
+import at.fhtw.ode.helios.event.HeliosEventBus;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Responsive;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.themes.ValoTheme;
-import com.vaadin.ui.VerticalLayout;
 
-import at.fhtw.ode.helios.HeliosUI;
-import at.fhtw.ode.helios.domain.Location;
-import at.fhtw.ode.helios.event.HeliosEventBus;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @SuppressWarnings("serial")
 public class LocationsView extends VerticalLayout implements View {
 
-    public LocationsView() throws IOException, ExecutionException, InterruptedException {
+    public LocationsView() {
         setSizeFull();
         addStyleName("locations");
         setMargin(false);
@@ -71,7 +54,7 @@ public class LocationsView extends VerticalLayout implements View {
         return header;
     }
 
-    public Grid<Location> buildLocationTable() throws IOException, ExecutionException, InterruptedException {
+    public Grid<Location> buildLocationTable() {
         final DateFormat DATEFORMAT = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
         final Set<Column<Location, ?>> collapsibleColumns = new LinkedHashSet<>();
 
@@ -96,5 +79,4 @@ public class LocationsView extends VerticalLayout implements View {
     @Override
     public void enter(final ViewChangeEvent event) {
     }
-
 }

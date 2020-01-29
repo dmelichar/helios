@@ -6,10 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 
-
 @Repository
 public interface HeliosRepository extends JpaRepository<Location, Long> {
 
     Location findByDate(Date date);
-
 }

@@ -9,5 +9,4 @@ public class HeliosApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HeliosApplication.class, args);
 	}
-
 }

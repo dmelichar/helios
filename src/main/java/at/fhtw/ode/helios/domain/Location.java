@@ -3,21 +3,14 @@ package at.fhtw.ode.helios.domain;
 import org.vaadin.addon.leaflet.shared.Point;
 
 import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.util.Arrays;
 import java.util.Date;
 
-
 @Entity
-@Table(name = "locations")
-public class Location extends AbstractEntity {
+public class Location extends AbstractEntity{
 
-    //@Column(columnDefinition = "POINT")
     private Point location;
-
-    //@Temporal(TemporalType.DATE)
     private Date date;
-
     private String timestamp;
 
     public Point getLocation() {
@@ -35,10 +28,6 @@ public class Location extends AbstractEntity {
     public void setLocation(Point location) {
         this.location = location;
     }
-    @Override
-    public String toString() {
-        return String.format("%s @ %s", Arrays.toString(location.getLatLonPair()), date.toString());
-    }
 
     public String getTimestamp() {
         return timestamp;
@@ -46,5 +35,10 @@ public class Location extends AbstractEntity {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s @ %s", Arrays.toString(location.getLatLonPair()), date.toString());
     }
 }

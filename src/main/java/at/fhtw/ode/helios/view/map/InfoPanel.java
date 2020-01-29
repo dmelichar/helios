@@ -252,7 +252,6 @@ public class InfoPanel extends Window {
                 System.out.println(document.getId() + " => " + document.toObject(Coord.class));
             }
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
