@@ -65,10 +65,10 @@ public class MapView extends VerticalLayout implements View {
         locateISS.addClickListener((Button.ClickListener) event -> locateISSListener());
         buttonHeader.addComponent(locateISS);
 
-        Button astronatusCheck = new Button("Astronaut check");
-        astronatusCheck.setIcon(VaadinIcons.ROCKET);
-        astronatusCheck.addClickListener((Button.ClickListener) event -> peopleInSpace());
-        buttonHeader.addComponent(astronatusCheck);
+        Button astronautsCheck = new Button("Astronaut check");
+        astronautsCheck.setIcon(VaadinIcons.ROCKET);
+        astronautsCheck.addClickListener((Button.ClickListener) event -> peopleInSpace());
+        buttonHeader.addComponent(astronautsCheck);
 
         return buttonHeader;
     }
@@ -114,10 +114,9 @@ public class MapView extends VerticalLayout implements View {
         cancel.setClickShortcut(ShortcutAction.KeyCode.ESCAPE, null);
 
         // Set components
-        footer.addComponents(astronautImage, cancel);
+        footer.addComponents(cancel);
         footer.setExpandRatio(cancel, 1);
         footer.setComponentAlignment(cancel, Alignment.BOTTOM_RIGHT);
-        footer.setComponentAlignment(astronautImage, Alignment.BOTTOM_LEFT);
 
         subContent.addComponents(number, people, astronautImage, footer);
         subContent.setComponentAlignment(astronautImage, Alignment.MIDDLE_CENTER);
@@ -158,10 +157,9 @@ public class MapView extends VerticalLayout implements View {
         });
     }
 
-        public void saveLocation () {
+    public void saveLocation () {
         Multimap<Long, Location> locationMultimap = MultimapBuilder.hashKeys().arrayListValues().build();
 
-        //TODO: Fix bug: First location is not saved
         map.addLocateListener(event -> {
             Location myLocation = new Location();
             myLocation.setLocation(event.getPoint());
@@ -169,7 +167,6 @@ public class MapView extends VerticalLayout implements View {
             locationMultimap.put(locationMapCounter, myLocation);
             locationMapCounter++;
         });
-
         HeliosUI.getDataProvider().generateLocationsMap(locationMultimap);
     }
 }

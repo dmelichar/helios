@@ -42,6 +42,13 @@ public class DataProvider {
         issData = initISS();
     }
 
+    public InternationalSpaceStation initISS() {
+        InternationalSpaceStation builder = new InternationalSpaceStation();
+        builder.setPeople(pollPeopleInSpace());
+        builder.setNumberOfPeopleInSpace(pollPeopleInSpace().size());
+        return builder;
+    }
+
     public void generateLocationsMap (Multimap<Long, Location> locationMultimap) {
         locations = locationMultimap;
     }
@@ -49,14 +56,7 @@ public class DataProvider {
     public Collection<Location> getRecentLocations(int count) {
         List<Location> orderedLocations = Lists.newArrayList(locations.values());
         orderedLocations.sort((o1, o2) -> o2.getDate().compareTo((o1.getDate())));
-        return orderedLocations.subList(0, Math.min(count, locations.values().size() - 1));
-    }
-
-    public InternationalSpaceStation initISS() {
-        InternationalSpaceStation builder = new InternationalSpaceStation();
-        builder.setPeople(pollPeopleInSpace());
-        builder.setNumberOfPeopleInSpace(pollPeopleInSpace().size());
-        return builder;
+        return orderedLocations.subList(0, Math.min(count, locations.values().size()));
     }
 
     public Location pollCurrentISSLocation() {

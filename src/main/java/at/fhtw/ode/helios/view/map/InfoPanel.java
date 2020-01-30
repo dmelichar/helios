@@ -199,6 +199,7 @@ public class InfoPanel extends Window {
         footer.addComponents(cancel);
         footer.setExpandRatio(cancel, 1);
         footer.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
+
         return footer;
     }
 
