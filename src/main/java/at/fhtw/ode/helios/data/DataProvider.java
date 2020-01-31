@@ -49,16 +49,6 @@ public class DataProvider {
         return builder;
     }
 
-    public void generateLocationsMap (Multimap<Long, Location> locationMultimap) {
-        locations = locationMultimap;
-    }
-
-    public Collection<Location> getRecentLocations(int count) {
-        List<Location> orderedLocations = Lists.newArrayList(locations.values());
-        orderedLocations.sort((o1, o2) -> o2.getDate().compareTo((o1.getDate())));
-        return orderedLocations.subList(0, Math.min(count, locations.values().size()));
-    }
-
     public Location pollCurrentISSLocation() {
         Location location = null;
 
@@ -154,6 +144,16 @@ public class DataProvider {
             e.printStackTrace();
         }
         return weather;
+    }
+
+    public void generateLocationsMap (Multimap<Long, Location> locationMultimap) {
+        locations = locationMultimap;
+    }
+
+    public Collection<Location> getRecentLocations(int count) {
+        List<Location> orderedLocations = Lists.newArrayList(locations.values());
+        orderedLocations.sort((o1, o2) -> o2.getDate().compareTo((o1.getDate())));
+        return orderedLocations.subList(0, Math.min(count, locations.values().size()));
     }
 
     /* JSON utility method */

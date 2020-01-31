@@ -80,7 +80,7 @@ public class InfoPanel extends Window {
         else {
             weatherInfo.setValue(weather.getSummary() + ". " + celsius + " degrees celsius and the average visibility is " + visibility + " miles.");
         }
-        if (weather.getCloudCover() < 0.5) {
+        if (weather.getCloudCover() < 0.55) {
             cloudInfo.setValue("Not many clouds cover the sky! You should be able to spot the International Space Station!");
         }
         else {

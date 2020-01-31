@@ -58,10 +58,12 @@ public class MapView extends VerticalLayout implements View {
         buttonHeader.addComponent(titleLabel);
 
         Button locate = new Button("Locate Me");
+        locate.setIcon(VaadinIcons.LOCATION_ARROW);
         locate.addClickListener((Button.ClickListener) event -> map.locate());
         buttonHeader.addComponent(locate);
 
         Button locateISS = new Button("Locate ISS");
+        locateISS.setIcon(VaadinIcons.LOCATION_ARROW);
         locateISS.addClickListener((Button.ClickListener) event -> locateISSListener());
         buttonHeader.addComponent(locateISS);
 
@@ -76,9 +78,12 @@ public class MapView extends VerticalLayout implements View {
     public void locateISSListener() {
         final LMarker markerISS = new LMarker();
 
+        String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+        FileResource resourceSatellite = new FileResource(new File(basepath + "/WEB-INF/images/Satellite.png"));
+
         Location locationISS = HeliosUI.getDataProvider().pollCurrentISSLocation();
 
-        markerISS.setIcon(FontAwesome.SPACE_SHUTTLE);
+        markerISS.setIcon(resourceSatellite);
         markerISS.setPopup("ISS Location in the coordinates " + locationISS.getLocation() + " at timestamp: " + locationISS.getDate());
         markerISS.setPoint(locationISS.getLocation());
         map.addComponents(markerISS);
@@ -91,7 +96,6 @@ public class MapView extends VerticalLayout implements View {
         String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
         FileResource astronautResource = new FileResource(new File(basepath + "/WEB-INF/images/Astronaut.png"));
         Image astronautImage = new Image(null, astronautResource);
-        astronautImage.setWidth(64.0f, Unit.PIXELS);
 
         // Create a sub-window and set the content
         Window subWindow = new Window("Astronauts");

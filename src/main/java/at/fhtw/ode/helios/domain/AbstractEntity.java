@@ -1,6 +1,9 @@
 package at.fhtw.ode.helios.domain;
 
-import javax.persistence.*;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -10,9 +13,6 @@ public abstract class AbstractEntity implements Serializable, Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @Version
-    private int version;
 
     public Long getId() {
         return id;
